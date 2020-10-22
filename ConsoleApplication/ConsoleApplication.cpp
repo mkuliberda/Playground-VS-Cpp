@@ -7,26 +7,29 @@
 #include <bitset>
 #include <stdlib.h>     //for using the function sleep
 #include <windows.h>
-
+#include "plants.h"
+#include <vector>
 
 
 void decorator_test(void) {
 	std::string name = "Pelargonia";
 	uint8_t id = 0;
 	PlantInterface *anPlantWithDMAMoistureSensor = new PlantWithDMAMoistureSensor(new Plant(name, 0), 3.3, 4095);
-	cout << anPlantWithDMAMoistureSensor->getMoisturePercent() << endl;
+	std::cout << anPlantWithDMAMoistureSensor->getMoisturePercent() << std::endl;
 	anPlantWithDMAMoistureSensor->updateRaw((uint16_t)3);
-	cout << anPlantWithDMAMoistureSensor->getMoisturePercent() << endl;
-	cout << anPlantWithDMAMoistureSensor->getName() << endl;
-	cout << anPlantWithDMAMoistureSensor->getId() << endl;
+	std::cout << anPlantWithDMAMoistureSensor->getMoisturePercent() << std::endl;
+	std::cout << anPlantWithDMAMoistureSensor->getName() << std::endl;
+	std::cout << anPlantWithDMAMoistureSensor->getId() << std::endl;
 
+
+	//for System Builder std::unique_pointer with vector will need to be used
 	std::vector< std::unique_ptr<PlantInterface>> vPlants;
 	vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant("Pelargonia", 0), 3.0, 4095)));
-	cout<< "vPlants size: "<< vPlants.size() << " capacity: "<< vPlants.capacity()<<endl;
+	std::cout<< "vPlants size: "<< vPlants.size() << " capacity: "<< vPlants.capacity()<<std::endl;
 	vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant("Kroton", 0), 3.0, 4095)));
-	cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << endl;
+	std::cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << std::endl;
 	vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant("Surfinia", 0), 3.0, 4095)));
-	cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << endl;
+	std::cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << std::endl;
 
 
 	//plants.emplace_back()
