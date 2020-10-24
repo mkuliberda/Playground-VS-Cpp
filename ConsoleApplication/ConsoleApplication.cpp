@@ -9,6 +9,7 @@
 #include <windows.h>
 #include "plants.h"
 #include <vector>
+#include "sector.h"
 
 
 void decorator_test(void) {
@@ -34,6 +35,22 @@ void decorator_test(void) {
 
 	//plants.emplace_back()
 	delete anPlantWithDMAMoistureSensor;
+	std::cout << std::endl;
+
+}
+
+void builder_test(void) {
+
+	SectorBuilder* sector1_builder = new SectorBuilder;
+	sector1_builder->ProducePartA();
+	sector1_builder->ProducePartB();
+	sector1_builder->ProducePartC();
+	std::unique_ptr<Sector>(p_sector1);
+	p_sector1 = sector1_builder->GetProduct();
+	delete sector1_builder;
+
+
+	p_sector1->ListParts();
 
 }
 
@@ -43,6 +60,7 @@ int main()
     std::cout << "Hello World!\n";
 	while (1) {
 		decorator_test();
+		builder_test();
 		Sleep(1000);
 	}
 	return 0;
