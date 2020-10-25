@@ -3,6 +3,7 @@
 #include <iostream>
 #include "main.h"
 #include <vector>
+#include "plants.h"
 /**
  * It makes sense to use the Builder pattern only when your sectors are quite
  * complex and require extensive configuration.
@@ -13,7 +14,31 @@
  */
 
 class Sector{
-    public:
+private:
+	const uint8_t 										id;
+	const uint8_t 										plants_count_limit = 20;
+	uint8_t 											plants_count;
+	uint8_t 											encoded_status;
+	bool												watering;
+
+public:
+	std::vector<std::unique_ptr<PlantInterface>>		vPlants;
+
+	const uint8_t getId() const{
+		return id;
+	}
+
+	const uint8_t getPlantsCountLimit() const{
+		return plants_count_limit;
+	}
+
+	uint8_t getPlantsCount() const {
+		return plants_count;
+	}
+
+	uint8_t incrementPlantsCount(){
+		return plants_count++ <= plants_count_limit ? plants_count : plants_count_limit;
+	}
     std::vector<std::string> parts_;
     void ListParts()const{
         std::cout << "Sector parts: ";
@@ -26,6 +51,16 @@ class Sector{
         }
         std::cout << "\n\n"; 
     }
+	Sector(const uint8_t& _id):
+		id(_id)
+	{
+		std::cout << "Standard Constructor Sector" << std::endl;
+	}
+	Sector(const uint8_t&& _id):
+		id(std::move(_id)) 
+	{
+		std::cout << "Move Constructor Sector" << std::endl;
+	}
 	~Sector() {
 		std::cout << "Sector dtor" << std::endl;
 	}
@@ -36,22 +71,23 @@ class Sector{
  * The Builder interface specifies methods for creating the different parts of
  * the Sector objects.
  */
-class Builder{
+class SectorBuilder{
     public:
-    virtual ~Builder(){}
+    virtual ~SectorBuilder(){}
     virtual void ProducePartA() const =0;
     virtual void ProducePartB() const =0;
     virtual void ProducePartC() const =0;
+	virtual void producePlantWithDMAMoistureSensor(const std::string& _p_name, const float& _ref_voltage = 3.3, const uint32_t& _quantization_levels = 4095) const = 0;
 };
 /**
  * The Concrete Builder classes follow the Builder interface and provide
  * specific implementations of the building steps. Your program may have several
  * variations of Builders, implemented differently.
  */
-class SectorBuilder : public Builder{
+class ConcreteSectorBuilder : public SectorBuilder{
     private:
-
 	std::unique_ptr<Sector> sector;
+	int8_t sector_count = -1;
 
     /**
      * A fresh builder instance should contain a blank sector object, which is
@@ -59,17 +95,17 @@ class SectorBuilder : public Builder{
      */
     public:
 
-    SectorBuilder(){
+    ConcreteSectorBuilder(){
         this->Reset();
     }
 
-    ~SectorBuilder(){
-		std::cout << "SectorBuilder dtor" << std::endl;
+    ~ConcreteSectorBuilder(){
+		std::cout << "ConcreteSectorBuilder dtor" << std::endl;
         //delete sector;
     }
 
     void Reset(){
-		this->sector.reset(new Sector);
+		this->sector.reset(new Sector(static_cast<uint8_t>(++sector_count)));
     }
     /**
      * All production steps work with the same sector instance.
@@ -86,6 +122,16 @@ class SectorBuilder : public Builder{
     void ProducePartC()const override{
         this->sector->parts_.push_back("PartC1");
     }
+
+	void producePlantWithDMAMoistureSensor(const std::string& _p_name, const float& _ref_voltage = 3.3, const uint32_t& _quantization_levels = 4095)const override {
+		uint8_t idx = this->sector->incrementPlantsCount()-1;
+		if (idx != this->sector->getPlantsCountLimit()) {
+			this->sector->vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant(_p_name, idx), _ref_voltage, _quantization_levels)));
+			this->sector->vPlants.shrink_to_fit();
+			this->sector->parts_.push_back(this->sector->vPlants.at(idx)->getName());
+		}
+
+	}
 
     /**
      * Concrete Builders are supposed to provide their own methods for

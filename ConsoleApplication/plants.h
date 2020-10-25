@@ -4,6 +4,11 @@
 #include <iostream>
 #include "main.h"
 
+enum plant_type: uint8_t {
+	plant_only,
+	plant_with_dma_moisture_sensor
+};
+
 //Decorator design pattern used for plants
 class PlantInterface {
 public:
@@ -13,23 +18,26 @@ public:
 	virtual std::string getName() = 0;
 	virtual uint8_t getId() = 0;
 	virtual void updateRaw(const uint32_t &_raw_measurement) = 0;
+	virtual void setPlantType(const plant_type& _p_type=plant_only) = 0;
+	virtual plant_type getPlantType() = 0;
 };
 
 class Plant : public PlantInterface {
 private:
 
+	plant_type p_type;
 	std::string name;
 	float soil_moisture_percent = -1000;
 	uint8_t id;
 
 public:
-
 	Plant(const std::string& _name, const uint8_t& _id) :
 		name(_name),
 		id(_id)
 	{
 		std::cout << "Plant standard constructor" << std::endl;
 		name.shrink_to_fit();
+		plant_type p_type = plant_only;
 	}
 
 	Plant(const std::string&& _name, const uint8_t&& _id) :
@@ -38,8 +46,8 @@ public:
 	{
 		std::cout << "Plant move constructor" << std::endl;
 		name.shrink_to_fit();
+		plant_type p_type = plant_only;
 	}
-
 
 	~Plant()
 	{
@@ -69,6 +77,14 @@ public:
 	}
 
 	void updateRaw(const uint32_t& _raw_measurement) {
+	}
+
+	void setPlantType(const plant_type& _p_type = plant_only) {
+		this->p_type = _p_type;
+	}
+
+	plant_type getPlantType(void) {
+		return this->p_type;
 	}
 
 };
@@ -102,6 +118,14 @@ public:
 	void updateRaw(const uint32_t &_raw_measurement) {
 	}
 
+	void setPlantType(const plant_type& _p_type = plant_only) {
+		m_wrappee->setPlantType(_p_type);
+	}
+
+	plant_type getPlantType(void) {
+		return m_wrappee->getPlantType();
+	}
+
 private:
 	PlantInterface *m_wrappee;
 };
@@ -118,6 +142,7 @@ public:
 		PlantWithSensor(core),
 		ref_voltage(_ref_voltage),
 		quantization_levels(_quantization_levels) {
+		setPlantType();
 		std::cout << "PlantWithDMAMoistureSensor standard constructor" << std::endl;
 	}
 
@@ -125,6 +150,7 @@ public:
 		PlantWithSensor(core),
 		ref_voltage(std::move(_ref_voltage)),
 		quantization_levels(std::move(_quantization_levels)) {
+		setPlantType();
 		std::cout << "PlantWithDMAMoistureSensor move constructor" << std::endl;
 	}
 
@@ -159,4 +185,11 @@ public:
 		PlantWithSensor::setMoisturePercent(moisture_percent);
 	}
 
+	void setPlantType(const plant_type& _p_type = plant_only) {
+		PlantWithSensor::setPlantType(plant_type::plant_with_dma_moisture_sensor);
+	}
+
+	plant_type getPlantType() {
+		return PlantWithSensor::getPlantType();
+	}
 };

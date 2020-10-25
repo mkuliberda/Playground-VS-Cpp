@@ -32,6 +32,9 @@ void decorator_test(void) {
 	vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant("Surfinia", 0), 3.0, 4095)));
 	std::cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << std::endl;
 
+	if (vPlants.at(1)->getPlantType() == plant_type::plant_with_dma_moisture_sensor) {
+		std::cout << "plant_type::plant_with_dma_moisture_sensor" << std::endl;
+	}
 
 	//plants.emplace_back()
 	delete anPlantWithDMAMoistureSensor;
@@ -41,17 +44,23 @@ void decorator_test(void) {
 
 void builder_test(void) {
 
-	SectorBuilder* sector1_builder = new SectorBuilder;
-	sector1_builder->ProducePartA();
-	sector1_builder->ProducePartB();
-	sector1_builder->ProducePartC();
+	ConcreteSectorBuilder* sector_builder = new ConcreteSectorBuilder; //leave as pointer to delete when not needed anymore
+	sector_builder->ProducePartA();
+	sector_builder->ProducePartB();
+	sector_builder->ProducePartC();
 	std::unique_ptr<Sector>(p_sector1);
-	p_sector1 = sector1_builder->GetProduct();
-	delete sector1_builder;
+	p_sector1 = sector_builder->GetProduct();
 
+	sector_builder->ProducePartA();
+	sector_builder->ProducePartC();
+	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia");
+	std::unique_ptr<Sector>(p_sector2);
+	p_sector2 = sector_builder->GetProduct();
+
+	delete sector_builder;
 
 	p_sector1->ListParts();
-
+	p_sector2->ListParts();
 }
 
 
