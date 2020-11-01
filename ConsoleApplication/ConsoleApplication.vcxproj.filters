@@ -27,12 +27,15 @@
     <ClInclude Include="sector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pumps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="ConsoleApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConsoleApplication.cpp">
+    <ClCompile Include="pumps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

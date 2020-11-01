@@ -20,15 +20,18 @@ public:
 	virtual void updateRaw(const uint32_t &_raw_measurement) = 0;
 	virtual void setPlantType(const plant_type& _p_type=plant_only) = 0;
 	virtual plant_type getPlantType() = 0;
+	virtual void setRainExposition(const bool& _rain_exposed) = 0;
+	virtual bool isRainExposed() = 0;
 };
 
 class Plant : public PlantInterface {
 private:
 
-	plant_type p_type;
-	std::string name;
-	float soil_moisture_percent = -1000;
-	uint8_t id;
+	plant_type											p_type;
+	std::string											name;
+	float												soil_moisture_percent = -1000;
+	uint8_t												id;
+	bool												rain_exposed = true;
 
 public:
 	Plant(const std::string& _name, const uint8_t& _id) :
@@ -87,6 +90,14 @@ public:
 		return this->p_type;
 	}
 
+	void setRainExposition(const bool& _rain_exposed) {
+		rain_exposed = _rain_exposed;
+	}
+
+	bool isRainExposed() {
+		return rain_exposed;
+	}
+
 };
 
 class PlantWithSensor : public PlantInterface {
@@ -124,6 +135,14 @@ public:
 
 	plant_type getPlantType(void) {
 		return m_wrappee->getPlantType();
+	}
+
+	void setRainExposition(const bool& _rain_exposed) {
+		m_wrappee->setRainExposition(_rain_exposed);
+	}
+
+	bool isRainExposed() {
+		return m_wrappee->isRainExposed();
 	}
 
 private:
@@ -191,5 +210,13 @@ public:
 
 	plant_type getPlantType() {
 		return PlantWithSensor::getPlantType();
+	}
+
+	void setRainExposition(const bool& _rain_exposed) {
+		PlantWithSensor::setRainExposition(_rain_exposed);
+	}
+
+	bool isRainExposed() {
+		return PlantWithSensor::isRainExposed();
 	}
 };

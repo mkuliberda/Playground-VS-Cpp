@@ -10,6 +10,7 @@
 #include "plants.h"
 #include <vector>
 #include "sector.h"
+#include "pumps.h"
 
 
 void decorator_test(void) {
@@ -43,6 +44,13 @@ void decorator_test(void) {
 }
 
 void builder_test(void) {
+	constexpr struct gpio_s pump1gpio_in1 = { 0, 0 };
+	constexpr struct gpio_s pump1gpio_in2 = { 0, 1 };
+	constexpr std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
+	constexpr struct gpio_s pump1led = { 2, 0 };
+	constexpr struct gpio_s pump1fault = { 0, 2 };
+	constexpr struct gpio_s pump1mode = { 0, 3 };
+
 
 	ConcreteSectorBuilder* sector_builder = new ConcreteSectorBuilder; //leave as pointer to delete when not needed anymore
 	sector_builder->ProducePartA();
@@ -54,6 +62,8 @@ void builder_test(void) {
 	sector_builder->ProducePartA();
 	sector_builder->ProducePartC();
 	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia");
+	sector_builder->producePlantWithDMAMoistureSensor("Kroton");
+	sector_builder->producePumpWithController(pumpcontrollermode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
 	std::unique_ptr<Sector>(p_sector2);
 	p_sector2 = sector_builder->GetProduct();
 
@@ -61,15 +71,53 @@ void builder_test(void) {
 
 	p_sector1->ListParts();
 	p_sector2->ListParts();
+	int id = p_sector2->vPlants.at(0)->getId();
+	std::cout << id << std::endl;
+	id = p_sector2->vPlants.at(1)->getId();
+	std::cout << id << std::endl;
+	p_sector2->vPlants.at(1)->isRainExposed();
+	bool water = false;
+	p_sector2->pump_controller.update(1, water);
+}
+
+void controller_test(bool _watering, const double& _dt) {
+	constexpr struct gpio_s pump1gpio_in1 = { 0, 0 };
+	constexpr struct gpio_s pump1gpio_in2 = { 0, 1 };
+	constexpr std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
+	constexpr struct gpio_s pump1led = { 2, 0 };
+	constexpr struct gpio_s pump1fault = { 0, 2 };
+	constexpr struct gpio_s pump1mode = { 0, 3 };
+
+	PumpController controller1;
+	controller1.setMode(pumpcontrollermode_t::external);
+	controller1.createPump(pumptype_t::drv8833_dc);
+	controller1.p8833Pump->init(0, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
+
+	controller1.update(_dt, _watering);
 }
 
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	std::cout << "Hello World!\n";
+	double dt = 0;
+	bool watering = false;
+
 	while (1) {
 		decorator_test();
 		builder_test();
+
+		if (dt < 15) watering = true;
+		else if (dt >= 15 && dt < 30) watering = false;
+		else {
+			dt = 0;
+			watering = true;
+		}
+		controller_test(watering, 1);
+
+		if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
+		else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
+		dt++;
 		Sleep(1000);
 	}
 	return 0;
