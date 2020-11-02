@@ -14,11 +14,10 @@
  * always follow the same interface.
  */
 
-class Sector{
+class IrrigationSector{
 private:
 	const uint8_t 										id;
 	const uint8_t 										plants_count_limit = 20;
-	uint8_t 											plants_count;
 	uint8_t 											encoded_status;
 	bool												watering;
 
@@ -35,15 +34,12 @@ public:
 	}
 
 	uint8_t getPlantsCount() const {
-		return plants_count;
+		return static_cast<uint8_t>(vPlants.size());
 	}
 
-	uint8_t incrementPlantsCount(){
-		return plants_count++ <= plants_count_limit ? plants_count : plants_count_limit;
-	}
     std::vector<std::string> parts_;
     void ListParts()const{
-        std::cout << "Sector parts: ";
+        std::cout << "IrrigationSector parts: ";
         for (size_t i=0;i<parts_.size();i++){
             if(parts_[i]== parts_.back()){
                 std::cout << parts_[i];
@@ -53,18 +49,42 @@ public:
         }
         std::cout << "\n\n"; 
     }
-	Sector(const uint8_t& _id):
+
+	float getPlantHealth(const std::string& _name) const{
+		for (auto &plant: vPlants) {
+			if (_name.compare(plant->getName()) == 0) return plant->getMoisturePercent();
+		}
+		return -1;
+	}
+
+	float getPlantHealth(const uint8_t& _id) const{
+		for (auto &plant : vPlants) {
+			if (plant->getId() == _id) return plant->getMoisturePercent();
+		}
+		return -1;
+	}
+
+	void wateringSet(const bool & _activate_watering) {
+		watering = _activate_watering;
+	}
+
+	bool& wateringGet(void) {
+		return watering;
+	}
+
+
+	IrrigationSector(const uint8_t& _id):
 		id(_id)
 	{
-		std::cout << "Standard Constructor Sector" << std::endl;
+		std::cout << "Standard Constructor IrrigationSector" << std::endl;
 	}
-	Sector(const uint8_t&& _id):
+	IrrigationSector(const uint8_t&& _id):
 		id(std::move(_id)) 
 	{
-		std::cout << "Move Constructor Sector" << std::endl;
+		std::cout << "Move Constructor IrrigationSector" << std::endl;
 	}
-	~Sector() {
-		std::cout << "Sector dtor" << std::endl;
+	~IrrigationSector() {
+		std::cout << "IrrigationSector dtor" << std::endl;
 	}
 
 };
@@ -72,11 +92,11 @@ public:
 
 /**
  * The Builder interface specifies methods for creating the different parts of
- * the Sector objects.
+ * the IrrigationSector objects.
  */
-class SectorBuilder{
+class IrrigationSectorBuilder{
     public:
-    virtual ~SectorBuilder(){}
+    virtual ~IrrigationSectorBuilder(){}
     virtual void ProducePartA() const =0;
     virtual void ProducePartB() const =0;
     virtual void ProducePartC() const =0;
@@ -92,9 +112,9 @@ class SectorBuilder{
  * specific implementations of the building steps. Your program may have several
  * variations of Builders, implemented differently.
  */
-class ConcreteSectorBuilder : public SectorBuilder{
+class ConcreteIrrigationSectorBuilder : public IrrigationSectorBuilder{
     private:
-	std::unique_ptr<Sector> sector;
+	std::unique_ptr<IrrigationSector> sector;
 	int8_t sector_count = -1;
 
     /**
@@ -103,16 +123,16 @@ class ConcreteSectorBuilder : public SectorBuilder{
      */
     public:
 
-    ConcreteSectorBuilder(){
+    ConcreteIrrigationSectorBuilder(){
         this->Reset();
     }
 
-    ~ConcreteSectorBuilder(){
-		std::cout << "ConcreteSectorBuilder dtor" << std::endl;
+    ~ConcreteIrrigationSectorBuilder(){
+		std::cout << "ConcreteIrrigationSectorBuilder dtor" << std::endl;
     }
 
     void Reset(){
-		this->sector.reset(new Sector(static_cast<uint8_t>(++sector_count)));
+		this->sector.reset(new IrrigationSector(static_cast<uint8_t>(++sector_count)));
     }
     /**
      * All production steps work with the same sector instance.
@@ -131,11 +151,11 @@ class ConcreteSectorBuilder : public SectorBuilder{
     }
 
 	void producePlantWithDMAMoistureSensor(const std::string& _p_name, const float& _ref_voltage = 3.3, const uint32_t& _quantization_levels = 4095)const override {
-		uint8_t idx = this->sector->incrementPlantsCount() - 1;
-		if (idx != this->sector->getPlantsCountLimit()) {
-			this->sector->vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant(_p_name, idx), _ref_voltage, _quantization_levels)));
-			this->sector->vPlants.shrink_to_fit();
-			this->sector->parts_.push_back(this->sector->vPlants.at(idx)->getName());
+		uint8_t idx = static_cast<uint8_t>(sector->vPlants.size());
+		if (idx <= sector->getPlantsCountLimit()) {
+			sector->vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant(_p_name, idx), _ref_voltage, _quantization_levels)));
+			sector->vPlants.shrink_to_fit();
+			sector->parts_.push_back(sector->vPlants.at(idx)->getName());
 		}
 	}
 
@@ -144,10 +164,10 @@ class ConcreteSectorBuilder : public SectorBuilder{
 		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout)const override {
 
 		this->sector->pump_controller.setMode(_controller_mode);
-		if (this->sector->pump_controller.createPump(pumptype_t::drv8833_dc) == true) {
-			this->sector->pump_controller.p8833Pump->init(0, _idletime_required_seconds,
+		if (sector->pump_controller.createPump(pumptype_t::drv8833_dc) == true) {
+			sector->pump_controller.p8833Pump->init(0, _idletime_required_seconds,
 				_runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout);
-			this->sector->parts_.push_back("DRV8833Pump");
+			sector->parts_.push_back("DRV8833Pump");
 		}
 	}
 
@@ -187,8 +207,8 @@ class ConcreteSectorBuilder : public SectorBuilder{
      * memory leaks
      */
 
-    std::unique_ptr<Sector> GetProduct() {
-		std::unique_ptr<Sector>(result);
+    std::unique_ptr<IrrigationSector> GetProduct() {
+		std::unique_ptr<IrrigationSector>(result);
 		result = std::move(this->sector);
         this->Reset();
         return result;

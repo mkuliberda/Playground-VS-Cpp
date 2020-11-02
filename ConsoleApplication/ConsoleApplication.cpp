@@ -52,11 +52,11 @@ void builder_test(void) {
 	constexpr struct gpio_s pump1mode = { 0, 3 };
 
 
-	ConcreteSectorBuilder* sector_builder = new ConcreteSectorBuilder; //leave as pointer to delete when not needed anymore
+	ConcreteIrrigationSectorBuilder* sector_builder = new ConcreteIrrigationSectorBuilder; //leave as pointer to delete when not needed anymore
 	sector_builder->ProducePartA();
 	sector_builder->ProducePartB();
 	sector_builder->ProducePartC();
-	std::unique_ptr<Sector>(p_sector1);
+	std::unique_ptr<IrrigationSector>(p_sector1);
 	p_sector1 = sector_builder->GetProduct();
 
 	sector_builder->ProducePartA();
@@ -64,7 +64,7 @@ void builder_test(void) {
 	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia");
 	sector_builder->producePlantWithDMAMoistureSensor("Kroton");
 	sector_builder->producePumpWithController(pumpcontrollermode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
-	std::unique_ptr<Sector>(p_sector2);
+	std::unique_ptr<IrrigationSector>(p_sector2);
 	p_sector2 = sector_builder->GetProduct();
 
 	delete sector_builder;
@@ -78,6 +78,7 @@ void builder_test(void) {
 	p_sector2->vPlants.at(1)->isRainExposed();
 	bool water = false;
 	p_sector2->pump_controller.update(1, water);
+	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
 }
 
 void controller_test(bool _watering, const double& _dt) {
