@@ -156,12 +156,16 @@
     <ClInclude Include="plants.h" />
     <ClInclude Include="pumps.h" />
     <ClInclude Include="sector.h" />
+    <ClInclude Include="sensors.h" />
+    <ClInclude Include="watertank.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication.cpp" />
     <ClCompile Include="plants.cpp" />
     <ClCompile Include="pumps.cpp" />
     <ClCompile Include="sector.cpp" />
+    <ClCompile Include="sensors.cpp" />
+    <ClCompile Include="watertank.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

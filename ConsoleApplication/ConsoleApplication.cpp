@@ -11,6 +11,7 @@
 #include <vector>
 #include "sector.h"
 #include "pumps.h"
+#include "watertank.h"
 
 
 void decorator_test(void) {
@@ -79,8 +80,18 @@ void builder_test(void) {
 	bool water = false;
 	p_sector2->pump_controller.update(1, water);
 	p_sector2->update();
-	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "-----------------------------setPlantMoistureByName success" << sizeof(PumpInfo_s) << std::endl;
+	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "-----------------------------setPlantMoistureByName success"  << std::endl;
 	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
+
+	ConcreteWatertankBuilder* watertank_builder = new ConcreteWatertankBuilder; //leave as pointer to delete when not needed anymore
+	watertank_builder->ProducePartA().ProducePartC();
+	std::unique_ptr<Watertank>(p_watertank);
+	p_watertank = watertank_builder->GetProduct();
+
+	delete watertank_builder;
+	
+	p_watertank->ListParts();
+
 }
 
 void controller_test(bool _watering, const double& _dt) {

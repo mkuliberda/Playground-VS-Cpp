@@ -30,6 +30,12 @@
     <ClInclude Include="pumps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="watertank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sensors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication.cpp">
@@ -42,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="watertank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sensors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

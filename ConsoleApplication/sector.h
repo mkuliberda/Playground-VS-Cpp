@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <iostream>
+#include <iostream>  //TODO: delete on STM32
 #include "main.h"
 #include <vector>
 #include "plants.h"
@@ -28,6 +28,7 @@ struct IrrigationSectorInfo_s {
 class IrrigationSector{
 private:
 	const uint8_t 										plants_count_limit = 20;
+	const float											plant_dry_level = 10;
 	bool												watering;
 	struct IrrigationSectorInfo_s						sector_info;
 
