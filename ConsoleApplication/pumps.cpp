@@ -1,6 +1,53 @@
 #include "pumps.h"
 
 
+void encodePumpStatus(const struct PumpInfo_s & _pump, uint32_t & status) {
+
+	switch (_pump.id)
+	{
+	case 0:
+		status |= _pump.state;
+		if (_pump.forced == true) 			status |= (1 << 6);
+		if (_pump.cmd_consumed == true) 	status |= (1 << 7);
+		break;
+	case 1:
+		status |= _pump.state << 8;
+		if (_pump.forced == true) 			status |= (1 << 14);
+		if (_pump.cmd_consumed == true) 	status |= (1 << 15);
+		break;
+	case 2:
+		status |= (_pump.state << 16);
+		if (_pump.forced == true) 			status |= (1 << 22);
+		if (_pump.cmd_consumed == true) 	status |= (1 << 23);
+		break;
+	case 3:
+		status |= (_pump.state << 24);
+		if (_pump.forced == true) 			status |= (1 << 30);
+		if (_pump.cmd_consumed == true) 	status |= (1 << 31);
+		break;
+	default:
+		break;
+	}
+
+}
+
+void decodePumpStatus(std::array<struct PumpInfo_s, 4> & a_pump, const std::bitset<32> & _status) {
+
+	const std::bitset<32> pumpstatemask(0x0000000F);
+	std::bitset<32> tmp;
+
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		tmp = _status;
+		if (i > 0) tmp >>= 8 * i;
+		tmp &= pumpstatemask;
+		a_pump[i].id = i;
+		a_pump[i].state = tmp.to_ulong();
+		if (_status.test(6)) a_pump[i].forced = true;
+		if (_status.test(7)) a_pump[i].cmd_consumed = true;
+	}
+}
+
 /************************************/
 /*! Pump class implementation */
 /************************************/
@@ -23,7 +70,7 @@ bool Pump::isRunning(void) {
 	return getState() == pumpstate_t::running || getState() == pumpstate_t::reversing ? true : false;
 }
 
-struct pumpstatus_s& Pump::getStatus(void) {
+struct PumpInfo_s& Pump::getStatus(void) {
 	return status;
 }
 
@@ -782,49 +829,3 @@ uint8_t& PumpController::getPumpStatusEncoded(void) {
 	return this->pump_encoded_status;
 }
 
-void pumpStateEncode(const struct pumpstatus_s & _pump, uint32_t & status) {
-
-	switch (_pump.id)
-	{
-	case 0:
-		status |= _pump.state;
-		if (_pump.forced == true) 			status |= (1 << 6);
-		if (_pump.cmd_consumed == true) 	status |= (1 << 7);
-		break;
-	case 1:
-		status |= _pump.state << 8;
-		if (_pump.forced == true) 			status |= (1 << 14);
-		if (_pump.cmd_consumed == true) 	status |= (1 << 15);
-		break;
-	case 2:
-		status |= (_pump.state << 16);
-		if (_pump.forced == true) 			status |= (1 << 22);
-		if (_pump.cmd_consumed == true) 	status |= (1 << 23);
-		break;
-	case 3:
-		status |= (_pump.state << 24);
-		if (_pump.forced == true) 			status |= (1 << 30);
-		if (_pump.cmd_consumed == true) 	status |= (1 << 31);
-		break;
-	default:
-		break;
-	}
-
-}
-
-void pumpStateDecode(std::array<struct pumpstatus_s, 4> & a_pump, const std::bitset<32> & _status) {
-
-	const std::bitset<32> pumpstatemask(0x0000000F);
-	std::bitset<32> tmp;
-
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		tmp = _status;
-		if (i > 0) tmp >>= 8 * i;
-		tmp &= pumpstatemask;
-		a_pump[i].id = i;
-		a_pump[i].state = tmp.to_ulong();
-		if (_status.test(6)) a_pump[i].forced = true;
-		if (_status.test(7)) a_pump[i].cmd_consumed = true;
-	}
-}

@@ -38,5 +38,11 @@
     <ClCompile Include="pumps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

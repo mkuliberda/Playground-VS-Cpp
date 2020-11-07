@@ -159,7 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication.cpp" />
+    <ClCompile Include="plants.cpp" />
     <ClCompile Include="pumps.cpp" />
+    <ClCompile Include="sector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

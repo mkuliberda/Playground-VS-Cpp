@@ -33,7 +33,7 @@ void decorator_test(void) {
 	vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant("Surfinia", 0), 3.0, 4095)));
 	std::cout << "vPlants size: " << vPlants.size() << " capacity: " << vPlants.capacity() << std::endl;
 
-	if (vPlants.at(1)->getPlantType() == plant_type::plant_with_dma_moisture_sensor) {
+	if (vPlants.at(1)->getPlantType() == plant_type_t::plant_with_dma_moisture_sensor) {
 		std::cout << "plant_type::plant_with_dma_moisture_sensor" << std::endl;
 	}
 
@@ -78,6 +78,8 @@ void builder_test(void) {
 	p_sector2->vPlants.at(1)->isRainExposed();
 	bool water = false;
 	p_sector2->pump_controller.update(1, water);
+	p_sector2->update();
+	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "-----------------------------setPlantMoistureByName success" << sizeof(PumpInfo_s) << std::endl;
 	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
 }
 

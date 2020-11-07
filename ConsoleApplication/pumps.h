@@ -6,11 +6,11 @@
 #include <vector>
 #include <iostream>
 
-struct pumpstatus_s {
-	uint8_t id = 0;
-	uint32_t state = 0;
-	bool forced = false;
-	bool cmd_consumed = false;
+struct PumpInfo_s {
+	uint32_t	state = 0;
+	uint8_t		id = 0;
+	bool		forced = false;
+	bool		cmd_consumed = false;
 };
 
 enum class pumpstate_t {
@@ -50,6 +50,8 @@ enum class pumpcontrollermode_t {
 	sleep
 };
 
+void encodePumpStatus(const struct PumpInfo_s& _pump, uint32_t& status);
+void decodePumpStatus(std::array<struct PumpInfo_s, 4>& a_pump, const std::bitset<32>& _status);
 
 class Pump {
 
@@ -57,7 +59,7 @@ protected:
 
 	pumptype_t					type = pumptype_t::generic;
 	pumpstate_t 				state = pumpstate_t::init;		///< current pump's working state based on enum pumpstate_t
-	struct pumpstatus_s 		status;
+	struct PumpInfo_s	 		status;
 	double 						runtime_seconds;				///< current runtime, incrementing in running state [seconds]
 	double 						idletime_seconds;				///< current idletime incrementing in stopped and waiting state [seconds]
 	uint32_t 					runtime_limit_seconds;			///< runtime limit for particular pump [seconds]
@@ -83,7 +85,7 @@ public:
 	virtual void 				setState(const pumpstate_t & _st) = 0;
 	pumpstate_t&				getState(void);
 	bool						isRunning(void);
-	struct pumpstatus_s&		getStatus(void);
+	struct PumpInfo_s&			getStatus(void);
 	void						resetRuntime(void);
 	void						increaseRuntime(const double & _dt);
 	double&						getRuntimeSeconds(void);
@@ -198,7 +200,4 @@ public:
 
 
 };
-
-void pumpStateEncode(const struct pumpstatus_s & _pump, uint32_t & status);
-void pumpStateDecode(std::array<struct pumpstatus_s, 4> & a_pump, const std::bitset<32> & _status);
 
