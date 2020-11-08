@@ -12,6 +12,7 @@
 #include "sector.h"
 #include "pumps.h"
 #include "watertank.h"
+#include "sensors.h"
 
 
 void decorator_test(void) {
@@ -94,6 +95,7 @@ void builder_test(void) {
 
 }
 
+
 void controller_test(bool _watering, const double& _dt) {
 	constexpr struct gpio_s pump1gpio_in1 = { 0, 0 };
 	constexpr struct gpio_s pump1gpio_in2 = { 0, 1 };
@@ -110,6 +112,38 @@ void controller_test(bool _watering, const double& _dt) {
 	controller1.update(_dt, _watering);
 }
 
+void bridge_test() {
+	std::cout << "-------------------------------bridge test-----------------------------------" << std::endl;
+	constexpr struct gpio_s optwlsensor1gpio_in = { 3, 2 };
+	std::vector<Sensor*>(vSensors);
+
+	vSensors.emplace_back(new OpticalWaterLevelSensor(0.3, { 3, 2 }));
+
+
+	Sensor *sensor1 = new Sensor(sensor_type_t::generic_sensor);
+	Sensor *sensor2 = new OpticalWaterLevelSensor(0.2, { 3, 2 });
+	Sensor *sensor3 = new ZuluSensor(6);
+
+	sensor1->read();
+	sensor2->read();
+	sensor3->read();
+	if (sensor3->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------temp sensor" << std::endl;
+	if (sensor2->getType() == sensor_type_t::waterlevel_sensor) std::cout << "------------------wl sensor" << std::endl;
+	if (sensor1->getType() == sensor_type_t::generic_sensor) std::cout << "------------------gen sensor" << std::endl;
+
+	delete sensor1;
+	delete sensor2;
+	delete sensor3;
+
+	bool is_submersed = true;
+
+	vSensors.back()->read();
+	vSensors.back()->getResult(is_submersed);
+
+	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
+
+}
+
 
 int main()
 {
@@ -118,8 +152,9 @@ int main()
 	bool watering = false;
 
 	while (1) {
-		decorator_test();
-		builder_test();
+		//decorator_test();
+		//builder_test();
+		bridge_test();
 
 		if (dt < 15) watering = true;
 		else if (dt >= 15 && dt < 30) watering = false;
