@@ -23,12 +23,19 @@ void OpticalWaterLevelSensorImp::getResult(bool& val) {
 	val = state == fixedwaterlevelsensorstate_t::wet ? true : false;
 }
 
-void ZuluSensorImp::read() {
-	std::cout << "ZuluSensorImp read: " << zone_ << std::endl;
+void WaterFlowSensorImp::read() {
+	std::cout << "WaterFlowSensorImp read: " << zone_ << std::endl;
 }
 
-void ZuluSensorImp::getResult(float& val) {
+void WaterFlowSensorImp::getResult(float& val) {
 	val = 6.5;
+}
+
+void TemperatureSensorImp::read() {
+
+}
+void TemperatureSensorImp::getResult(float& val) {
+
 }
 
 void Sensor::read() {

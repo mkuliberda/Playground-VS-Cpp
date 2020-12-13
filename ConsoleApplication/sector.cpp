@@ -59,7 +59,7 @@ const struct IrrigationSectorInfo_s&	IrrigationSector::getInfo() {
 	return sector_info;
 }
 
-void IrrigationSector::addPlantNameToLIst(const std::string&& _plant_name) const {
+void IrrigationSector::addPlantNameToList(const std::string&& _plant_name) const {
 	//TODO: implement this
 }
 
@@ -100,7 +100,7 @@ ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::producePlantWi
 	if (idx <= sector->getPlantsCountLimit()) {
 		sector->vPlants.emplace_back(std::unique_ptr<PlantInterface>(new PlantWithDMAMoistureSensor(new Plant(_p_name, idx), _ref_voltage, _quantization_levels)));
 		sector->vPlants.shrink_to_fit();
-		sector->addPlantNameToLIst(sector->vPlants.back()->getName());
+		sector->addPlantNameToList(sector->vPlants.back()->getName());
 		sector->parts_.push_back(sector->vPlants.at(idx)->getName()); //TODO: delete this on STM32
 	}
 	return *this;

@@ -49,7 +49,7 @@ public:
 	const bool&											getWateringState();
 	void												update() const;
 	const struct IrrigationSectorInfo_s&				getInfo();
-	void												addPlantNameToLIst(const std::string&& _plant_name) const;
+	void												addPlantNameToList(const std::string&& _plant_name) const;
 	bool												setPlantMoistureByName(const std::string& _plant_name, const float& _moisture_percent) const;
 
     std::vector<std::string> parts_;	//TODO: delete on STM32

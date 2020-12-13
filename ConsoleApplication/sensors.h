@@ -9,24 +9,12 @@ enum class fixedwaterlevelsensorstate_t {
 	dry
 };
 
-enum class waterlevelsensortype_t {
-	unknown,
-	optical,
-	capacitive,
-	resistive
-};
-
-enum class waterlevelsensorsubtype_t {
-	unknown,
-	fixed,
-	floating
-};
-
 enum class sensor_type_t {
 	generic_sensor,
 	waterlevel_sensor,
 	temperature_sensor,
-	waterflow_sensor
+	waterflow_sensor,
+	precipitation_sensor
 };
 
 class SensorImp {
@@ -83,30 +71,48 @@ protected:
 	struct gpio_s 							pinout;
 };
 
-class ZuluSensorImp : public SensorImp {
+class WaterFlowSensorImp : public SensorImp {
 public:
-	ZuluSensorImp(const int& _zone, const sensor_type_t& _type = sensor_type_t::temperature_sensor) : SensorImp(_type) {
-		if (_zone == 5)
-			strcpy_s(zone_, " Eastern Standard Sensor");
-		else if (_zone == 6)
-			strcpy_s(zone_, " Central Standard Sensor");
+	WaterFlowSensorImp(const sensor_type_t& _type = sensor_type_t::waterflow_sensor) : SensorImp(_type) {
 		sensor_type = _type;
-		std::cout << "ZuluSensorImp standard constructor " << std::endl;
+		std::cout << "WaterFlowSensorImp standard constructor " << std::endl;
 	}
-	~ZuluSensorImp() {
-		std::cout << "ZuluSensorImp dtor " << std::endl;
+	~WaterFlowSensorImp() {
+		std::cout << "WaterFlowSensorImp dtor " << std::endl;
 	}
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	ZuluSensorImp(ZuluSensorImp const &) = delete;
-	ZuluSensorImp& operator=(ZuluSensorImp const&) = delete;
+	WaterFlowSensorImp(WaterFlowSensorImp const &) = delete;
+	WaterFlowSensorImp& operator=(WaterFlowSensorImp const&) = delete;
 
 	/* virtual */
 	void									read();
 	void									getResult(float& val);
 
 protected:
-	char zone_[30];
+	char zone_[3] = "+1";
+};
+
+class TemperatureSensorImp : public SensorImp {
+public:
+	TemperatureSensorImp(const sensor_type_t& _type = sensor_type_t::temperature_sensor) : SensorImp(_type) {
+		sensor_type = _type;
+		std::cout << "TemperatureSensorImp standard constructor " << std::endl;
+	}
+	~TemperatureSensorImp() {
+		std::cout << "TemperatureSensorImp dtor " << std::endl;
+	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	TemperatureSensorImp(TemperatureSensorImp const &) = delete;
+	TemperatureSensorImp& operator=(TemperatureSensorImp const&) = delete;
+
+	/* virtual */
+	void									read();
+	void									getResult(float& val);
+
+protected:
+	char zone_[3] = "-1";
 };
 
 class Sensor {
@@ -131,7 +137,7 @@ public:
 	virtual void							getResult(bool& val);
 	virtual void							getResult(float& val);
 protected:
-	SensorImp *imp_;
+	SensorImp								*imp_;
 };
 
 class OpticalWaterLevelSensor : public Sensor {
@@ -152,15 +158,28 @@ public:
 	OpticalWaterLevelSensor& operator=(OpticalWaterLevelSensor const&) = delete;
 };
 
-class ZuluSensor : public Sensor {
+class WaterFlowSensor : public Sensor {
 public:
-	ZuluSensor(int zone) {
-		imp_ = new ZuluSensorImp(zone);
+	WaterFlowSensor() {
+		imp_ = new WaterFlowSensorImp();
 	}
-	~ZuluSensor() {
-		std::cout << "ZuluSensor dtor " << std::endl;
+	~WaterFlowSensor() {
+		std::cout << "WaterFlowSensor dtor " << std::endl;
 	}
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	ZuluSensor(ZuluSensor const &) = delete;
-	ZuluSensor& operator=(ZuluSensor const&) = delete;
+	WaterFlowSensor(WaterFlowSensor const &) = delete;
+	WaterFlowSensor& operator=(WaterFlowSensor const&) = delete;
+};
+
+class TemperatureSensor : public Sensor {
+public:
+	TemperatureSensor() {
+		imp_ = new TemperatureSensorImp();
+	}
+	~TemperatureSensor() {
+		std::cout << "TemperatureSensor dtor " << std::endl;
+	}
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	TemperatureSensor(TemperatureSensor const &) = delete;
+	TemperatureSensor& operator=(TemperatureSensor const&) = delete;
 };

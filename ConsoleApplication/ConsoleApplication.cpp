@@ -92,6 +92,8 @@ void builder_test(void) {
 	delete watertank_builder;
 	
 	p_watertank->ListParts();
+	p_watertank->setHeight(78.0_cm);
+	std::cout << "literals-----------------" << p_watertank->getHeight() << std::endl;
 
 }
 
@@ -117,18 +119,18 @@ void bridge_test() {
 	const struct gpio_s optwlsensor1gpio_in = { 3, 2 };
 	std::vector<std::unique_ptr<Sensor>>(vSensors);
 
+	vSensors.emplace_back(new WaterFlowSensor());
 	vSensors.emplace_back(new OpticalWaterLevelSensor(0.3, { 3, 2 }));
-	vSensors.emplace_back(new OpticalWaterLevelSensor(0.8, { 3, 3 }));
-
+	vSensors.emplace_back(new OpticalWaterLevelSensor(0.8, { 3, 1 }));
 
 	Sensor *sensor1 = new Sensor(sensor_type_t::generic_sensor);
 	Sensor *sensor2 = new OpticalWaterLevelSensor(0.2, { 3, 2 });
-	Sensor *sensor3 = new ZuluSensor(6);
+	Sensor *sensor3 = new WaterFlowSensor();
 
 	sensor1->read();
 	sensor2->read();
 	sensor3->read();
-	if (sensor3->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------temp sensor" << std::endl;
+	if (sensor3->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------waterflow sensor" << std::endl;
 	if (sensor2->getType() == sensor_type_t::waterlevel_sensor) std::cout << "------------------wl sensor" << std::endl;
 	if (sensor1->getType() == sensor_type_t::generic_sensor) std::cout << "------------------gen sensor" << std::endl;
 
@@ -142,6 +144,8 @@ void bridge_test() {
 	vSensors.back()->getResult(is_submersed);
 
 	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
+	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "-----------------------------vSensors waterflow sensor" << std::endl;
+
 
 }
 
