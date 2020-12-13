@@ -77,6 +77,10 @@ public:
 		std::cout << "IrrigationSector dtor" << std::endl;
 	}
 
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	IrrigationSector(IrrigationSector const &) = delete;
+	IrrigationSector& operator=(IrrigationSector const&) = delete;
+
 };
 
 
@@ -121,6 +125,10 @@ public:
     ~ConcreteIrrigationSectorBuilder(){
 		std::cout << "ConcreteIrrigationSectorBuilder dtor" << std::endl;
     }
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	ConcreteIrrigationSectorBuilder(ConcreteIrrigationSectorBuilder const &) = delete;
+	ConcreteIrrigationSectorBuilder& operator=(ConcreteIrrigationSectorBuilder const&) = delete;
 
 	void														Reset();
 	ConcreteIrrigationSectorBuilder&							ProducePartA() override;

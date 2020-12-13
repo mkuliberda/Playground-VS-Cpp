@@ -25,7 +25,6 @@ private:
 
 	struct WatertankInfo_s								watertank_info;
 
-
 public:
 	//std::vector<std::unique_ptr<PlantInterface>>		vPlants;
 
@@ -47,19 +46,25 @@ public:
 		watertank_info.id = _id;
 		std::cout << "Standard Constructor Watertank" << std::endl;
 	}
+
 	Watertank(const uint8_t&& _id) {
 		watertank_info.id = std::move(_id);
 		std::cout << "Move Constructor Watertank" << std::endl;
 	}
+
 	~Watertank() {
 		std::cout << "Watertank dtor" << std::endl;
 	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	Watertank(Watertank const &) = delete;
+	Watertank& operator=(Watertank const&) = delete;
 
 };
 
 /**
  * The Builder interface specifies methods for creating the different parts of
- * the Watetank objects.
+ * the Watertank objects.
  */
 class WatertankBuilder {
 public:
@@ -87,12 +92,17 @@ private:
 public:
 
 	ConcreteWatertankBuilder() {
+		std::cout << "ConcreteWatertankBuilder" << std::endl;
 		this->Reset();
 	}
 
 	~ConcreteWatertankBuilder() {
 		std::cout << "ConcreteWatertankBuilder dtor" << std::endl;
 	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	ConcreteWatertankBuilder(ConcreteWatertankBuilder const &) = delete;
+	ConcreteWatertankBuilder& operator=(ConcreteWatertankBuilder const&) = delete;
 
 	void												Reset();
 	ConcreteWatertankBuilder&							ProducePartA() override;

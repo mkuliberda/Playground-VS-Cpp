@@ -38,6 +38,10 @@ public:
 	~SensorImp() {
 		std::cout << "SensorImp dtor " << std::endl;
 	}
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	SensorImp(SensorImp const &) = delete;
+	SensorImp& operator=(SensorImp const&) = delete;
+
 	virtual void						read();
 	virtual sensor_type_t				getType();
 	virtual void						getResult(bool& val);
@@ -65,6 +69,10 @@ public:
 		std::cout << "OpticalWaterLevelSensorImp dtor " << std::endl;
 	}
 
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	OpticalWaterLevelSensorImp(OpticalWaterLevelSensorImp const &) = delete;
+	OpticalWaterLevelSensorImp& operator=(OpticalWaterLevelSensorImp const&) = delete;
+
 	/* virtual */
 	void									read();
 	void									getResult(bool& val);
@@ -89,6 +97,9 @@ public:
 		std::cout << "ZuluSensorImp dtor " << std::endl;
 	}
 
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	ZuluSensorImp(ZuluSensorImp const &) = delete;
+	ZuluSensorImp& operator=(ZuluSensorImp const&) = delete;
 
 	/* virtual */
 	void									read();
@@ -111,6 +122,10 @@ public:
 		std::cout << "Sensor dtor " << std::endl;
 		delete imp_;
 	}
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	Sensor(Sensor const &) = delete;
+	Sensor& operator=(Sensor const&) = delete;
+
 	virtual void							read();
 	virtual sensor_type_t					getType();
 	virtual void							getResult(bool& val);
@@ -132,6 +147,9 @@ public:
 	~OpticalWaterLevelSensor() {
 		std::cout << "OpticalWaterLevelSensor dtor " << std::endl;
 	}
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	OpticalWaterLevelSensor(OpticalWaterLevelSensor const &) = delete;
+	OpticalWaterLevelSensor& operator=(OpticalWaterLevelSensor const&) = delete;
 };
 
 class ZuluSensor : public Sensor {
@@ -142,4 +160,7 @@ public:
 	~ZuluSensor() {
 		std::cout << "ZuluSensor dtor " << std::endl;
 	}
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	ZuluSensor(ZuluSensor const &) = delete;
+	ZuluSensor& operator=(ZuluSensor const&) = delete;
 };

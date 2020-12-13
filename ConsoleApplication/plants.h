@@ -56,6 +56,12 @@ public:
 	{
 		std::cout << "Plant dtor		";
 	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	Plant(Plant const &) = delete;				
+	Plant& operator=(Plant const&) = delete;
+
+
 	/*virtual*/
 	float											getMoisturePercent(void);
 	std::string										getName(void);
@@ -80,6 +86,10 @@ public:
 		std::cout << "PlantWithSensor  dtor		";
 		delete m_wrappee;
 	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	PlantWithSensor(PlantWithSensor const &) = delete;
+	PlantWithSensor& operator=(PlantWithSensor const&) = delete;
 
 	float											getMoisturePercent();
 	bool											setMoisturePercent(const float& _moisture);
@@ -119,6 +129,11 @@ public:
 	~PlantWithDMAMoistureSensor() {
 		std::cout << "PlantWithDMAMoistureSensor  dtor	";
 	}
+
+	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
+	PlantWithDMAMoistureSensor(PlantWithDMAMoistureSensor const &) = delete;
+	PlantWithDMAMoistureSensor& operator=(PlantWithDMAMoistureSensor const&) = delete;
+
 	/*virtual*/
 	float											getMoisturePercent();
 	float											getMoistureVolts();

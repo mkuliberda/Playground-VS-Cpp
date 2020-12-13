@@ -46,12 +46,12 @@ void decorator_test(void) {
 }
 
 void builder_test(void) {
-	constexpr struct gpio_s pump1gpio_in1 = { 0, 0 };
-	constexpr struct gpio_s pump1gpio_in2 = { 0, 1 };
-	constexpr std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
-	constexpr struct gpio_s pump1led = { 2, 0 };
-	constexpr struct gpio_s pump1fault = { 0, 2 };
-	constexpr struct gpio_s pump1mode = { 0, 3 };
+	const struct gpio_s pump1gpio_in1 = { 0, 0 };
+	const struct gpio_s pump1gpio_in2 = { 0, 1 };
+	const std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
+	const struct gpio_s pump1led = { 2, 0 };
+	const struct gpio_s pump1fault = { 0, 2 };
+	const struct gpio_s pump1mode = { 0, 3 };
 
 
 	ConcreteIrrigationSectorBuilder* sector_builder = new ConcreteIrrigationSectorBuilder; //leave as pointer to delete when not needed anymore
@@ -97,12 +97,12 @@ void builder_test(void) {
 
 
 void controller_test(bool _watering, const double& _dt) {
-	constexpr struct gpio_s pump1gpio_in1 = { 0, 0 };
-	constexpr struct gpio_s pump1gpio_in2 = { 0, 1 };
-	constexpr std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
-	constexpr struct gpio_s pump1led = { 2, 0 };
-	constexpr struct gpio_s pump1fault = { 0, 2 };
-	constexpr struct gpio_s pump1mode = { 0, 3 };
+	const struct gpio_s pump1gpio_in1 = { 0, 0 };
+	const struct gpio_s pump1gpio_in2 = { 0, 1 };
+	const std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
+	const struct gpio_s pump1led = { 2, 0 };
+	const struct gpio_s pump1fault = { 0, 2 };
+	const struct gpio_s pump1mode = { 0, 3 };
 
 	PumpController controller1;
 	controller1.setMode(pumpcontrollermode_t::external);
@@ -114,10 +114,11 @@ void controller_test(bool _watering, const double& _dt) {
 
 void bridge_test() {
 	std::cout << "-------------------------------bridge test-----------------------------------" << std::endl;
-	constexpr struct gpio_s optwlsensor1gpio_in = { 3, 2 };
-	std::vector<Sensor*>(vSensors);
+	const struct gpio_s optwlsensor1gpio_in = { 3, 2 };
+	std::vector<std::unique_ptr<Sensor>>(vSensors);
 
 	vSensors.emplace_back(new OpticalWaterLevelSensor(0.3, { 3, 2 }));
+	vSensors.emplace_back(new OpticalWaterLevelSensor(0.8, { 3, 3 }));
 
 
 	Sensor *sensor1 = new Sensor(sensor_type_t::generic_sensor);
@@ -152,8 +153,8 @@ int main()
 	bool watering = false;
 
 	while (1) {
-		//decorator_test();
-		//builder_test();
+		decorator_test();
+		builder_test();
 		bridge_test();
 
 		if (dt < 15) watering = true;
@@ -162,12 +163,12 @@ int main()
 			dt = 0;
 			watering = true;
 		}
-		controller_test(watering, 1);
+		//controller_test(watering, 1);
 
 		if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		dt++;
-		Sleep(1000);
+		Sleep(50);
 	}
 	return 0;
 
