@@ -198,9 +198,9 @@ void ConcreteWatertankBuilder::produceOpticalWaterLevelSensor(const float& _moun
 	}
 }
 
-void ConcreteWatertankBuilder::produceTemperatureSensor(const struct gpio_s& _pinout) {
+void ConcreteWatertankBuilder::produceDS18B20TemperatureSensor(const struct gpio_s& _pinout, TIM_HandleTypeDef* _tim_baseHandle) {
 	if (watertank->incrementTemperatureSensorsCount() == W_SUCCESS) {
-		watertank->vSensors.emplace_back(new DS18B20TemperatureSensor(_pinout));
+		watertank->vSensors.emplace_back(new DS18B20TemperatureSensor(_pinout, _tim_baseHandle));
 		watertank->parts_.push_back("TemperatureSensor"); //TODO: delete on STM32
 		watertank->vSensors.shrink_to_fit();
 	}

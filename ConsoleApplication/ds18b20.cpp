@@ -20,12 +20,12 @@ void DS18B20::delay_us(const uint32_t & _us) {
 bool& DS18B20::init(const struct gpio_s & _pinout, TIM_HandleTypeDef* _tim_baseHandle) {
 
 	this->valid = false;
-	//this->ptimer = _tim_baseHandle; //TODO: correct on STm32
+	this->ptimer = _tim_baseHandle;
 	this->pinout.port = _pinout.port;
 	this->pinout.pin = _pinout.pin;
 	uint8_t retry_count = 0;
 
-	//if (HAL_TIM_Base_Start(ptimer) != HAL_OK) this->valid = false; //TODO: uncomment on STM32
+	//while (HAL_TIM_Base_Start(ptimer) != HAL_OK); //this->valid = false; //TODO: chk & uncomment on STM32
 
 	while (this->valid == false && retry_count < 20) {
 		if (this->OneWire_Reset()) {

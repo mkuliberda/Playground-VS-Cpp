@@ -102,9 +102,9 @@ protected:
 
 class DS18B20TemperatureSensorImp : public SensorImp, public DS18B20{
 public:
-	DS18B20TemperatureSensorImp(const struct gpio_s& _pinout, const sensor_type_t& _type = sensor_type_t::temperature_sensor) : SensorImp(_type) {
+	DS18B20TemperatureSensorImp(const struct gpio_s& _pinout, TIM_HandleTypeDef* _tim_baseHandle, const sensor_type_t& _type = sensor_type_t::temperature_sensor) : SensorImp(_type) {
 		sensor_type = _type;
-		this->init(_pinout, 0);
+		init(_pinout, _tim_baseHandle);
 		std::cout << "DS18B20TemperatureSensorImp standard constructor " << std::endl;//TODO: delete on STM32
 	}
 	~DS18B20TemperatureSensorImp() {
@@ -181,8 +181,8 @@ public:
 
 class DS18B20TemperatureSensor : public Sensor {
 public:
-	DS18B20TemperatureSensor(const struct gpio_s& _pinout) {
-		imp_ = new DS18B20TemperatureSensorImp(_pinout);
+	DS18B20TemperatureSensor(const struct gpio_s& _pinout, TIM_HandleTypeDef* _tim_baseHandle) {
+		imp_ = new DS18B20TemperatureSensorImp(_pinout, _tim_baseHandle);
 	}
 	~DS18B20TemperatureSensor() {
 		std::cout << "DS18B20TemperatureSensor dtor " << std::endl;//TODO: delete on STM32

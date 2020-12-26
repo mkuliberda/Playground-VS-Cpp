@@ -53,6 +53,8 @@ void builder_test(void) {
 	const struct gpio_s pump1fault = { 0, 2 };
 	const struct gpio_s pump1mode = { 0, 3 };
 	uint32_t error_code = 0;
+	TIM_HandleTypeDef Timer;
+	TIM_HandleTypeDef *pTimer = &Timer;
 
 
 	ConcreteIrrigationSectorBuilder* sector_builder = new ConcreteIrrigationSectorBuilder; //leave as pointer to delete when not needed anymore
@@ -93,7 +95,7 @@ void builder_test(void) {
 	watertank_builder->produceOpticalWaterLevelSensor(3.8_cm, { 3,1 });
 	watertank_builder->produceOpticalWaterLevelSensor(50.2_cm, { 3,2 });
 	watertank_builder->produceOpticalWaterLevelSensor(87.0_cm, { 3,3 });
-	watertank_builder->produceTemperatureSensor({ 3,1 });
+	watertank_builder->produceDS18B20TemperatureSensor({ 3,1 }, pTimer);
 	std::unique_ptr<Watertank>(p_watertank);
 	p_watertank = watertank_builder->GetProduct();
 
@@ -129,6 +131,9 @@ void bridge_test() {
 	std::cout << "-------------------------------bridge test-----------------------------------" << std::endl;
 	const struct gpio_s optwlsensor1gpio_in = { 3, 2 };
 	std::vector<std::unique_ptr<Sensor>>(vSensors);
+	TIM_HandleTypeDef Timer;
+	TIM_HandleTypeDef *pTimer = &Timer;
+
 
 	vSensors.emplace_back(new WaterFlowSensor({ 1, 2 }));
 	vSensors.emplace_back(new OpticalWaterLevelSensor(0.3, { 3, 2 }));
@@ -137,7 +142,7 @@ void bridge_test() {
 	Sensor *sensor1 = new Sensor(sensor_type_t::generic_sensor);
 	Sensor *sensor2 = new OpticalWaterLevelSensor(0.2, { 3, 2 });
 	Sensor *sensor3 = new WaterFlowSensor({ 1, 2 });
-	Sensor *sensor4 = new DS18B20TemperatureSensor({ 1, 2 });
+	Sensor *sensor4 = new DS18B20TemperatureSensor({ 1, 2 }, pTimer);
 
 	sensor1->read();
 	sensor2->read();

@@ -180,7 +180,7 @@ public:
 	virtual void ProducePartB() = 0;
 	virtual void ProducePartC() = 0;
 	virtual void produceOpticalWaterLevelSensor(const float& _mount_pos_meters, const struct gpio_s& _pinout) = 0;
-	virtual void produceTemperatureSensor(const struct gpio_s& _pinout) = 0;
+	virtual void produceDS18B20TemperatureSensor(const struct gpio_s& _pinout, TIM_HandleTypeDef* _tim_baseHandle) = 0;
 	virtual void setWatertankVolume(const double& _volume) = 0;
 	virtual void setWatertankHeight(const double& _height) = 0;
 
@@ -222,7 +222,7 @@ public:
 	void							ProducePartB() override;
 	void							ProducePartC() override;
 	void							produceOpticalWaterLevelSensor(const float& _mount_pos_meters, const struct gpio_s& _pinout) override;
-	void							produceTemperatureSensor(const struct gpio_s& _pinout);
+	void							produceDS18B20TemperatureSensor(const struct gpio_s& _pinout, TIM_HandleTypeDef* _tim_baseHandle);
 	void							setWatertankVolume(const double& _volume) override;
 	void							setWatertankHeight(const double& _height) override;
 	std::unique_ptr<Watertank>		GetProduct();

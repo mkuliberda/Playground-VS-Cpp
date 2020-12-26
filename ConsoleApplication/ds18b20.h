@@ -60,7 +60,7 @@ private:
 
 	bool 							valid;
 	struct gpio_s 					pinout;
-	//TIM_HandleTypeDef 				*ptimer;
+	TIM_HandleTypeDef 				*ptimer;
 	double							conversion_time_seconds;
 	bool							conversion_running;
 	float							temperature_celsius;
