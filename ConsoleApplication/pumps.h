@@ -5,6 +5,8 @@
 #include <bitset>
 #include <vector>
 #include <iostream>
+#include <chrono> //TODO: use UDLs for time counting and duration?
+
 
 struct PumpInfo_s {
 	uint32_t	state = 0;
@@ -184,13 +186,13 @@ public:
 	{};
 
 	~PumpController()
-	{
+	{ 
 		if (pBinPump != nullptr) delete pBinPump;
 		if (p8833Pump != nullptr) delete p8833Pump;
 	};
 
-	BinaryPump							*pBinPump = nullptr;
-	DRV8833Pump							*p8833Pump = nullptr;
+	BinaryPump							*pBinPump = nullptr; //TODO: implement Pumps as bridge design pattern?
+	DRV8833Pump							*p8833Pump = nullptr; //TODO: implement Pumps as bridge design pattern?
 
 	bool								update(const double & _dt, bool & _activate_watering);
 	bool								createPump(const pumptype_t & _pumptype);

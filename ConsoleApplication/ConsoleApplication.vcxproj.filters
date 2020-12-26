@@ -36,6 +36,9 @@
     <ClInclude Include="sensors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ds18b20.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication.cpp">
@@ -54,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sensors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ds18b20.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

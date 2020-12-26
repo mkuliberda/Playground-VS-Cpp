@@ -1,54 +1,63 @@
 #include "sensors.h"
 
-void SensorImp::read() {
-	std::cout << "SensorImp read sensor_type: " << 0 << std::endl;
+float SensorImp::read(const double& _dt) {
+	std::cout << "SensorImp read sensor_type: " << 0 << std::endl;//TODO: delete on STM32
+	return 1.0;
 }
 
 sensor_type_t SensorImp::getType() {
 	return sensor_type;
 }
 
-void SensorImp::getResult(bool& val) {
-	val = false;
-}
-void SensorImp::getResult(float& val) {
-	val = -1;
-}
 
-void OpticalWaterLevelSensorImp::read() {
-	std::cout << "OpticalWaterLevelSensorImp read: " << mount_pos_meters << std::endl;
-}
-
-void OpticalWaterLevelSensorImp::getResult(bool& val) {
-	val = state == fixedwaterlevelsensorstate_t::wet ? true : false;
-}
-
-void WaterFlowSensorImp::read() {
-	std::cout << "WaterFlowSensorImp read: " << zone_ << std::endl;
+float OpticalWaterLevelSensorImp::read(const double& _dt) {
+	if (isValid()) {
+		std::cout << "OpticalWaterLevelSensorImp read: " << mount_height_meters << std::endl;//TODO: delete on STM32
+		if (HAL_GPIO_ReadPin(this->pinout.port, this->pinout.pin) == GPIO_PIN_SET) {
+			return static_cast<float>(this->state = fixedwaterlevelsensorstate_t::dry);
+		}
+		else {
+			return static_cast<float>(this->state = fixedwaterlevelsensorstate_t::wet);
+		}
+	}
+	else {
+		return static_cast<float>(fixedwaterlevelsensorstate_t::undetermined);
+	}
 }
 
-void WaterFlowSensorImp::getResult(float& val) {
-	val = 6.5;
+void OpticalWaterLevelSensorImp::init(const float& _mount_height_meters, const struct gpio_s& _pinout) {
+	mount_height_meters = _mount_height_meters;
+	pinout.pin = _pinout.pin;
+	pinout.port = _pinout.port;
+	initialized = true;
+	read();
 }
 
-void TemperatureSensorImp::read() {
-
-}
-void TemperatureSensorImp::getResult(float& val) {
-
+const float& OpticalWaterLevelSensorImp::getMountHeightMeters(void) {
+	return this->mount_height_meters;
 }
 
-void Sensor::read() {
-	imp_->read();
+const bool& OpticalWaterLevelSensorImp::isValid(void) const{
+	return initialized;
+}
+
+bool OpticalWaterLevelSensorImp::isSubmersed(void) {
+	if(isValid())	return this->state == fixedwaterlevelsensorstate_t::wet ? true : false;
+	else return false;
+}
+
+float WaterFlowSensorImp::read(const double& _dt) {
+	std::cout << "WaterFlowSensorImp read: " << zone_ << std::endl;//TODO: delete on STM32
+	return 1.0;
+}
+
+float DS18B20TemperatureSensorImp::read(const double& _dt) {
+	return this->readTemperatureCelsius(_dt);
+}
+
+float Sensor::read(const double& _dt) {
+	return imp_->read(_dt);
 }
 sensor_type_t Sensor::getType() {
 	return imp_->getType();
-}
-
-void Sensor::getResult(bool& val) {
-	imp_->getResult(val);
-}
-
-void Sensor::getResult(float& val) {
-	imp_->getResult(val);
 }

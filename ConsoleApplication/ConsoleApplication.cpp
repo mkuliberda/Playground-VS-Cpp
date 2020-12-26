@@ -85,15 +85,23 @@ void builder_test(void) {
 	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
 
 	ConcreteWatertankBuilder* watertank_builder = new ConcreteWatertankBuilder; //leave as pointer to delete when not needed anymore
-	watertank_builder->ProducePartA().ProducePartC();
+	watertank_builder->setWatertankHeight(75.7_cm);
+	watertank_builder->setWatertankVolume(57.0_l);
+	watertank_builder->ProducePartA();
+	watertank_builder->ProducePartC();
+	watertank_builder->produceOpticalWaterLevelSensor(3.8_cm, { 3,1 });
+	watertank_builder->produceOpticalWaterLevelSensor(50.2_cm, { 3,2 });
+	watertank_builder->produceOpticalWaterLevelSensor(87.0_cm, { 3,3 });
+	watertank_builder->produceTemperatureSensor({ 3,1 });
 	std::unique_ptr<Watertank>(p_watertank);
 	p_watertank = watertank_builder->GetProduct();
 
 	delete watertank_builder;
 	
+	std::cout << "watertank parts" << std::endl;
 	p_watertank->ListParts();
-	p_watertank->setHeight(78.0_cm);
-	std::cout << "literals-----------------" << p_watertank->getHeight() << std::endl;
+	//p_watertank->setHeight(78.0_cm);
+	//std::cout << "literals-----------------" << p_watertank->getHeightMeters() << std::endl;
 
 }
 
@@ -119,29 +127,32 @@ void bridge_test() {
 	const struct gpio_s optwlsensor1gpio_in = { 3, 2 };
 	std::vector<std::unique_ptr<Sensor>>(vSensors);
 
-	vSensors.emplace_back(new WaterFlowSensor());
+	vSensors.emplace_back(new WaterFlowSensor({ 1, 2 }));
 	vSensors.emplace_back(new OpticalWaterLevelSensor(0.3, { 3, 2 }));
 	vSensors.emplace_back(new OpticalWaterLevelSensor(0.8, { 3, 1 }));
 
 	Sensor *sensor1 = new Sensor(sensor_type_t::generic_sensor);
 	Sensor *sensor2 = new OpticalWaterLevelSensor(0.2, { 3, 2 });
-	Sensor *sensor3 = new WaterFlowSensor();
+	Sensor *sensor3 = new WaterFlowSensor({ 1, 2 });
+	Sensor *sensor4 = new DS18B20TemperatureSensor({ 1, 2 });
 
 	sensor1->read();
 	sensor2->read();
 	sensor3->read();
-	if (sensor3->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------waterflow sensor" << std::endl;
+	if (sensor4->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------temp sensor" << std::endl;
+	if (sensor3->getType() == sensor_type_t::waterflow_sensor) std::cout << "------------------waterflow sensor" << std::endl;
 	if (sensor2->getType() == sensor_type_t::waterlevel_sensor) std::cout << "------------------wl sensor" << std::endl;
 	if (sensor1->getType() == sensor_type_t::generic_sensor) std::cout << "------------------gen sensor" << std::endl;
 
 	delete sensor1;
 	delete sensor2;
 	delete sensor3;
+	delete sensor4;
 
 	bool is_submersed = true;
 
-	vSensors.back()->read();
-	vSensors.back()->getResult(is_submersed);
+	is_submersed = static_cast<bool>(vSensors.back()->read());
+	//vSensors.back()->getResult(is_submersed);
 
 	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
 	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "-----------------------------vSensors waterflow sensor" << std::endl;
@@ -172,7 +183,7 @@ int main()
 		if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		dt++;
-		Sleep(50);
+		Sleep(1000);
 	}
 	return 0;
 

@@ -67,14 +67,14 @@ public:
 
 	IrrigationSector(const uint8_t& _id){
 		sector_info.id = _id;
-		std::cout << "Standard Constructor IrrigationSector" << std::endl;
+		std::cout << "Standard Constructor IrrigationSector" << std::endl;//TODO: delete on STM32
 	}
 	IrrigationSector(const uint8_t&& _id){
 		sector_info.id = std::move(_id);
-		std::cout << "Move Constructor IrrigationSector" << std::endl;
+		std::cout << "Move Constructor IrrigationSector" << std::endl;//TODO: delete on STM32
 	}
 	~IrrigationSector() {
-		std::cout << "IrrigationSector dtor" << std::endl;
+		std::cout << "IrrigationSector dtor" << std::endl;//TODO: delete on STM32
 	}
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
@@ -123,7 +123,7 @@ public:
     }
 
     ~ConcreteIrrigationSectorBuilder(){
-		std::cout << "ConcreteIrrigationSectorBuilder dtor" << std::endl;
+		std::cout << "ConcreteIrrigationSectorBuilder dtor" << std::endl;//TODO: delete on STM32
     }
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
