@@ -9,6 +9,9 @@
 #define W_FAIL			(uint8_t)0
 #define W_LIMIT_REACHED (uint8_t)2
 
+#define FIXED_WATER_LEVEL_SENSORS_LIMIT 10
+#define TEMPERATURE_SENSORS_LIMIT 3
+
 inline double operator"" _l(long double l) {
 	return l;
 }
@@ -85,7 +88,7 @@ private:
 	contentstate_t 						water_state;
 	double	 							tank_height_meters;
 	double		 						tank_volume_liters;
-	uint8_t								water_level_sensors_count;
+	uint8_t								fixed_water_level_sensors_count;
 	uint8_t								temperature_sensors_count;
 
 	void 								setWaterLevel(const contentlevel_t& _water_level);
@@ -96,18 +99,20 @@ private:
 
 public:
 	std::vector<std::unique_ptr<Sensor>>		vSensors;
-	const uint8_t 						water_level_sensors_limit;
+	const uint8_t 						fixed_water_level_sensors_limit;
 	const uint8_t 						temperature_sensors_limit;
 
 	bool 								update(const double& _dt, uint32_t&  errcodeBitmask);
-	float& 								getTemperatureCelsius(void);
+	float& 								getWaterTemperatureCelsius(void);
+	float 								getWaterTemperatureKelvin(void);
+	float 								getWaterTemperatureFahrenheit(void);
 	uint8_t		 						getWaterLevelPercent(void);
 	uint8_t&							getId(void);
 	void								setVolume(const double& _volume);
 	void								setHeight(const double& _height); 
 	double&								getHeightMeters(void);
 	uint8_t								incrementTemperatureSensorsCount(void);
-	uint8_t								incrementWaterLevelSensorsCount(void);
+	uint8_t								incrementFixedWaterLevelSensorsCount(void);
 
 
 	std::vector<std::string> parts_;	//TODO: delete on STM32
@@ -130,8 +135,8 @@ public:
 		water_state(contentstate_t::unknown),
 		tank_height_meters(0.0_m),
 		tank_volume_liters(0.0_l),
-		water_level_sensors_limit(20),
-		water_level_sensors_count(0),
+		fixed_water_level_sensors_limit(10),
+		fixed_water_level_sensors_count(0),
 		temperature_sensors_limit(3),
 		temperature_sensors_count(0)
 	{
@@ -145,8 +150,8 @@ public:
 		water_state(contentstate_t::unknown),
 		tank_height_meters(0.0_m),
 		tank_volume_liters(0.0_l),
-		water_level_sensors_limit(20),
-		water_level_sensors_count(0),
+		fixed_water_level_sensors_limit(10),
+		fixed_water_level_sensors_count(0),
 		temperature_sensors_limit(3),
 		temperature_sensors_count(0) 
 	{

@@ -32,9 +32,14 @@ public:
 	SensorImp& operator=(SensorImp const&) = delete;
 
 	virtual float						read(const double& _dt=0);
-	virtual sensor_type_t				getType();
+	virtual sensor_type_t				getType() const;
+	virtual bool						isValid() const;
+	virtual float						getMountHeightMeters() const;
 protected:
 	sensor_type_t						sensor_type;
+	bool								valid;
+	float 								mount_height_meters;
+
 };
 
 class OpticalWaterLevelSensorImp : public SensorImp {
@@ -63,15 +68,12 @@ public:
 	/* virtual */
 	float									read(const double& _dt = 0);
 	void									init(const float& _mount_height_meters, const struct gpio_s& _pinout);
-	const float&							getMountHeightMeters(void);
-	const bool&								isValid(void) const;
+	//const float&							getMountHeightMeters(void);
 	bool									isSubmersed(void);
 
 protected:
-	float 									mount_height_meters = 0.0;
 	fixedwaterlevelsensorstate_t 			state = fixedwaterlevelsensorstate_t::undetermined;
 	struct gpio_s 							pinout = {0, 0};
-	bool									initialized = false;
 
 };
 
@@ -140,6 +142,8 @@ public:
 
 	virtual float							read(const double& _dt = 0);
 	virtual sensor_type_t					getType();
+	virtual bool							isValid();
+	virtual float							getMountHeightMeters() const;
 protected:
 	SensorImp								*imp_;
 };

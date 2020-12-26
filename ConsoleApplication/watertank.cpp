@@ -6,8 +6,16 @@
 /*! Watertank class implementation */
 /***********************************/
 
-float& Watertank::getTemperatureCelsius(void) {
+float& Watertank::getWaterTemperatureCelsius(void) {
 	return this->mean_water_temperature_celsius;
+}
+
+float Watertank::getWaterTemperatureKelvin(void) {
+	return (this->mean_water_temperature_celsius - 273.15_C);
+}
+
+float Watertank::getWaterTemperatureFahrenheit(void) {
+	return ((this->mean_water_temperature_celsius - 32.0_C) * 5.0_C / 9.0_C);
 }
 
 void Watertank::setWaterLevel(const contentlevel_t & _water_level) {
@@ -49,75 +57,57 @@ bool Watertank::update(const double& _dt, uint32_t& errcodeBitmask) {
 	 * |----------------->wl sensor10 invalid        (31)	|----------------->(15)
 	 */
 
+	
 	uint8_t temp_water_level_percent = 0;
 	uint8_t water_level_percent = 0;
-	bool isOK = true;
-	bool temp_reading_valid = false;
+	bool is_ok = true;
+	float water_temperature = 0.0_C;
+	uint8_t water_temperature_readings_count = 0;
+	uint8_t water_level_readings_count = 0;
 	std::bitset<32> errcode; errcode.set();  //initialize bitset and set all bits to 1
 
 	for (auto &sensor : vSensors) {
 		switch (sensor->getType()) {
 		case sensor_type_t::waterlevel_sensor:
+			if (sensor->isValid() == true) {
+				errcode.reset(22 + water_level_readings_count);
+				if (sensor->read()) { //TODO: check if 1 means submersed on STm32
+					temp_water_level_percent = this->waterlevelConvertToPercent(sensor->getMountHeightMeters());
+					if (temp_water_level_percent > water_level_percent) water_level_percent = temp_water_level_percent;
+				}
+			}
 			break;
 		case sensor_type_t::temperature_sensor:
+			water_temperature += sensor->read(_dt);
+			errcode.reset(19 + water_temperature_readings_count);
+			water_temperature_readings_count++;
 			break;
 		default:
 			break;
 		}
 	}
-	/*if (this->temperatureSensorsCount > 0) {
 
-		std::vector <float> vTemperature;
+	if (water_temperature_readings_count > 0) {
+		this->mean_water_temperature_celsius = water_temperature / water_temperature_readings_count;
 
-		for (uint8_t i = 0; i < this->temperatureSensorsCount; i++) {
-			if (this->vTemperatureSensors[i].isValid() == true) {
-				float temp = this->vTemperatureSensors[i].temperatureCelsiusRead(_dt);
-				vTemperature.push_back(temp);
-				errcode.reset(19 + i);
-				tempReadingValid = true;
-			}
+		if (this->mean_water_temperature_celsius < 1.0_C) {
+			this->setWaterState(contentstate_t::frozen);
+			errcode.reset(17);
+			is_ok = false;
 		}
-
-		if (tempReadingValid == true) {
-			this->mean_watertemperatureCelsius = (accumulate(vTemperature.begin(), vTemperature.end(), 0)) / this->temperatureSensorsCount;
-
-			if (this->mean_watertemperatureCelsius < 0.0) {
-				this->stateSet(contentstate_t::frozen);
-				errcode.reset(17);
-				isOK = false;
-			}
-			else if (this->mean_watertemperatureCelsius > 100.0)
-			{
-				this->stateSet(contentstate_t::boiling);
-				errcode.reset(16);
-				isOK = false;
-			}
-			else {
-				this->stateSet(contentstate_t::liquid);
-				errcode.reset(16);
-				errcode.reset(17);
-			}
+		else if (this->mean_water_temperature_celsius > 90.0_C)
+		{
+			this->setWaterState(contentstate_t::boiling);
+			errcode.reset(16);
+			is_ok = false;
 		}
 		else {
-			//if temperature reading isn't valid then don't update state
+			this->setWaterState(contentstate_t::liquid);
+			errcode.reset(16);
+			errcode.reset(17);
 		}
 	}
-	else {
-		//isOK = false;//let's let it work without temperature sensor
-	}*/
-
-	//TODO: sensors implement to this class
-	/*if (this->waterlevelSensorsCount > 0) {
-		for (uint8_t i = 0; i < this->waterlevelSensorsCount; i++) {
-			if (this->vOpticalWLSensors[i].isValid() == true) {
-				errcode.reset(22 + i);
-				if (this->vOpticalWLSensors[i].isSubmersed()) {
-					temp_waterlevelPercent = this->waterlevelConvertToPercent(this->vOpticalWLSensors[i].mountpositionGet());
-					if (temp_waterlevelPercent > waterlevelPercent) waterlevelPercent = temp_waterlevelPercent;
-				}
-			}
-		}
-	}*/
+	
 
 	if (water_level_percent >= 98) { this->setWaterLevel(contentlevel_t::full); errcode.reset(18); }
 	else if (water_level_percent > 90) { this->setWaterLevel(contentlevel_t::above90); errcode.reset(18); }
@@ -129,11 +119,11 @@ bool Watertank::update(const double& _dt, uint32_t& errcodeBitmask) {
 	else if (water_level_percent > 30) { this->setWaterLevel(contentlevel_t::above30); errcode.reset(18); }
 	else if (water_level_percent > 20) { this->setWaterLevel(contentlevel_t::above20); errcode.reset(18); }
 	else if (water_level_percent > 10) { this->setWaterLevel(contentlevel_t::above10); errcode.reset(18); }
-	else if (water_level_percent >= 0) { this->setWaterLevel(contentlevel_t::empty); isOK = false; }
+	else if (water_level_percent >= 0) { this->setWaterLevel(contentlevel_t::empty); is_ok = false; }
 
 	errcodeBitmask = errcode.to_ulong();
 
-	return isOK;
+	return is_ok;
 }
 
 uint8_t Watertank::waterlevelConvertToPercent(const float& _level_meters) {
@@ -170,9 +160,9 @@ uint8_t Watertank::incrementTemperatureSensorsCount(void) {
 	}
 }
 
-uint8_t Watertank::incrementWaterLevelSensorsCount() {
-	if (water_level_sensors_count <= water_level_sensors_limit) {
-		water_level_sensors_count++;
+uint8_t Watertank::incrementFixedWaterLevelSensorsCount() {
+	if (fixed_water_level_sensors_count <= fixed_water_level_sensors_limit) {
+		fixed_water_level_sensors_count++;
 		return W_SUCCESS;
 	}
 	else {
@@ -201,9 +191,10 @@ void ConcreteWatertankBuilder::ProducePartC() {  //TODO: delete this on STM32
 }
 
 void ConcreteWatertankBuilder::produceOpticalWaterLevelSensor(const float& _mount_height_meters, const struct gpio_s& _pinout) {
-	if (watertank->incrementWaterLevelSensorsCount() == W_SUCCESS && _mount_height_meters <= watertank->getHeightMeters()) {
+	if (watertank->incrementFixedWaterLevelSensorsCount() == W_SUCCESS && _mount_height_meters <= watertank->getHeightMeters()) {
 		watertank->vSensors.emplace_back(new OpticalWaterLevelSensor(_mount_height_meters, _pinout));
 		watertank->parts_.push_back("OpticalWaterLevelSensor"); //TODO: delete on STM32
+		watertank->vSensors.shrink_to_fit();
 	}
 }
 
@@ -211,6 +202,7 @@ void ConcreteWatertankBuilder::produceTemperatureSensor(const struct gpio_s& _pi
 	if (watertank->incrementTemperatureSensorsCount() == W_SUCCESS) {
 		watertank->vSensors.emplace_back(new DS18B20TemperatureSensor(_pinout));
 		watertank->parts_.push_back("TemperatureSensor"); //TODO: delete on STM32
+		watertank->vSensors.shrink_to_fit();
 	}
 }
 

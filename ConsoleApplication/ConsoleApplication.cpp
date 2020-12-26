@@ -52,6 +52,7 @@ void builder_test(void) {
 	const struct gpio_s pump1led = { 2, 0 };
 	const struct gpio_s pump1fault = { 0, 2 };
 	const struct gpio_s pump1mode = { 0, 3 };
+	uint32_t error_code = 0;
 
 
 	ConcreteIrrigationSectorBuilder* sector_builder = new ConcreteIrrigationSectorBuilder; //leave as pointer to delete when not needed anymore
@@ -100,6 +101,8 @@ void builder_test(void) {
 	
 	std::cout << "watertank parts" << std::endl;
 	p_watertank->ListParts();
+	p_watertank->update(0.02, error_code);
+	std::cout << error_code << std::endl;
 	//p_watertank->setHeight(78.0_cm);
 	//std::cout << "literals-----------------" << p_watertank->getHeightMeters() << std::endl;
 
@@ -168,9 +171,9 @@ int main()
 	bool watering = false;
 
 	while (1) {
-		decorator_test();
+		//decorator_test();
 		builder_test();
-		bridge_test();
+		//bridge_test();
 
 		if (dt < 15) watering = true;
 		else if (dt >= 15 && dt < 30) watering = false;

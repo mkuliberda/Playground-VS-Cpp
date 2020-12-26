@@ -5,10 +5,17 @@ float SensorImp::read(const double& _dt) {
 	return 1.0;
 }
 
-sensor_type_t SensorImp::getType() {
+sensor_type_t SensorImp::getType() const{
 	return sensor_type;
 }
 
+bool SensorImp::isValid() const{
+	return this->valid;
+}
+
+float SensorImp::getMountHeightMeters() const {
+	return this->mount_height_meters;
+}
 
 float OpticalWaterLevelSensorImp::read(const double& _dt) {
 	if (isValid()) {
@@ -29,17 +36,17 @@ void OpticalWaterLevelSensorImp::init(const float& _mount_height_meters, const s
 	mount_height_meters = _mount_height_meters;
 	pinout.pin = _pinout.pin;
 	pinout.port = _pinout.port;
-	initialized = true;
+	valid = true;
 	read();
 }
 
-const float& OpticalWaterLevelSensorImp::getMountHeightMeters(void) {
+/*const float& OpticalWaterLevelSensorImp::getMountHeightMeters(void) {
 	return this->mount_height_meters;
-}
+}*/
 
-const bool& OpticalWaterLevelSensorImp::isValid(void) const{
-	return initialized;
-}
+/*const bool& OpticalWaterLevelSensorImp::isValid(void) const{
+	return valid;
+}*/
 
 bool OpticalWaterLevelSensorImp::isSubmersed(void) {
 	if(isValid())	return this->state == fixedwaterlevelsensorstate_t::wet ? true : false;
@@ -60,4 +67,12 @@ float Sensor::read(const double& _dt) {
 }
 sensor_type_t Sensor::getType() {
 	return imp_->getType();
+}
+
+bool Sensor::isValid() {
+	return imp_->isValid();
+}
+
+float Sensor::getMountHeightMeters() const {
+	return imp_->getMountHeightMeters();
 }
