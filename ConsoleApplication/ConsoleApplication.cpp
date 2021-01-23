@@ -119,12 +119,12 @@ void controller_test(bool _watering, const double& _dt) {
 	const struct gpio_s pump1fault = { 0, 2 };
 	const struct gpio_s pump1mode = { 0, 3 };
 
-	PumpController controller1;
+	/*PumpController controller1;
 	controller1.setMode(pumpcontrollermode_t::external);
 	controller1.createPump(pumptype_t::drv8833_dc);
 	controller1.p8833Pump->init(0, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
 
-	controller1.update(_dt, _watering);
+	controller1.update(_dt, _watering);*/
 }
 
 void bridge_test() {
@@ -165,6 +165,15 @@ void bridge_test() {
 	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
 	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "-----------------------------vSensors waterflow sensor" << std::endl;
 
+	Pump *pump0 = new Pump(0, pump_type_t::generic);
+	Pump *pump1 = new DRV8833DcPump(1, 10, 30, { 0,1 }, { 5,1 }, { 1,1 }, { 2,1 });
+	bool cmd_consumed = false;
+	pump0->run(0.02, cmd_consumed, pump_cmd_t::start);
+	pump1->run(0.02, cmd_consumed, pump_cmd_t::start);
+
+	delete pump0;
+	delete pump1;
+
 
 }
 
@@ -178,7 +187,7 @@ int main()
 	while (1) {
 		//decorator_test();
 		builder_test();
-		//bridge_test();
+		bridge_test();
 
 		if (dt < 15) watering = true;
 		else if (dt >= 15 && dt < 30) watering = false;

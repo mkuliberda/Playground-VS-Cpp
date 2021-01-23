@@ -51,7 +51,7 @@ public:
 		std::cout << "OpticalWaterLevelSensorImp standard constructor " << std::endl;//TODO: delete on STM32
 	}
 
-	OpticalWaterLevelSensorImp(const float&& _mount_height_meters, const struct gpio_s& _pinout, const sensor_type_t&& _type = sensor_type_t::waterlevel_sensor) : SensorImp(_type) {
+	OpticalWaterLevelSensorImp(const float&& _mount_height_meters, const struct gpio_s&& _pinout, const sensor_type_t&& _type = sensor_type_t::waterlevel_sensor) : SensorImp(_type) {
 		mount_height_meters = std::move(_mount_height_meters);
 		sensor_type = std::move(_type);
 		pinout = std::move(_pinout);
@@ -62,7 +62,7 @@ public:
 	}
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	OpticalWaterLevelSensorImp(OpticalWaterLevelSensorImp const &) = delete;
+	OpticalWaterLevelSensorImp(OpticalWaterLevelSensorImp const&) = delete;
 	OpticalWaterLevelSensorImp& operator=(OpticalWaterLevelSensorImp const&) = delete;
 
 	/* virtual */
@@ -89,7 +89,7 @@ public:
 	}
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	WaterFlowSensorImp(WaterFlowSensorImp const &) = delete;
+	WaterFlowSensorImp(WaterFlowSensorImp const&) = delete;
 	WaterFlowSensorImp& operator=(WaterFlowSensorImp const&) = delete;
 
 	/* virtual */
@@ -112,7 +112,7 @@ public:
 	}
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	DS18B20TemperatureSensorImp(DS18B20TemperatureSensorImp const &) = delete;
+	DS18B20TemperatureSensorImp(DS18B20TemperatureSensorImp const&) = delete;
 	DS18B20TemperatureSensorImp& operator=(DS18B20TemperatureSensorImp const&) = delete;
 
 	/* virtual */

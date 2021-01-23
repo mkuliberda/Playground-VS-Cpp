@@ -2,7 +2,7 @@
 
 float SensorImp::read(const double& _dt) {
 	std::cout << "SensorImp read sensor_type: " << 0 << std::endl;//TODO: delete on STM32
-	return 1.0;
+	return 0.0;
 }
 
 sensor_type_t SensorImp::getType() const{
