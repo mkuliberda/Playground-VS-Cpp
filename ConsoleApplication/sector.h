@@ -96,11 +96,14 @@ class IrrigationSectorBuilder{
     virtual IrrigationSectorBuilder& ProducePartC() =0;
 	virtual IrrigationSectorBuilder& producePlantWithDMAMoistureSensor(const std::string& _p_name, const float& _ref_voltage = 3.3,
 		const uint32_t& _quantization_levels = 4095) =0;
-	virtual IrrigationSectorBuilder& producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds,
+	virtual IrrigationSectorBuilder& produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds,
 		const uint32_t& _runtime_limit_seconds, const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, 
-		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) =0;
-	virtual IrrigationSectorBuilder& producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds,
-		const uint32_t& _runtime_limit_seconds, const struct gpio_s& _pinout, const struct gpio_s& _led) =0;
+		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) = 0;
+	virtual IrrigationSectorBuilder& produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds,
+		const uint32_t& _runtime_limit_seconds, const std::array<struct gpio_s, 4>& _pinout, const struct gpio_s& _led_pinout,
+		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) = 0;
+	virtual IrrigationSectorBuilder& produceBinaryPumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds,
+		const uint32_t& _runtime_limit_seconds, const struct gpio_s& _pinout, const struct gpio_s& _led) = 0;
 };
 /**
  * The Concrete Builder classes follow the Builder interface and provide
@@ -135,12 +138,15 @@ public:
 	ConcreteIrrigationSectorBuilder&							ProducePartB() override;
 	ConcreteIrrigationSectorBuilder&							ProducePartC() override;
 	ConcreteIrrigationSectorBuilder&							producePlantWithDMAMoistureSensor(const std::string& _p_name, const float& _ref_voltage = 3.3,
-		const uint32_t& _quantization_levels = 4095) override;
-	ConcreteIrrigationSectorBuilder&							producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
-		const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout,
-		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) override;
-	ConcreteIrrigationSectorBuilder&							producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
-		const struct gpio_s& _pinout, const struct gpio_s& _led) override;
+																const uint32_t& _quantization_levels = 4095) override;
+	ConcreteIrrigationSectorBuilder&							produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, \
+																const uint32_t& _runtime_limit_seconds, const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
+																const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) override;
+	ConcreteIrrigationSectorBuilder&							produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, \
+																const uint32_t& _runtime_limit_seconds, const std::array<struct gpio_s, 4>& _pinout, const struct gpio_s& _led_pinout, \
+																const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) override;
+	ConcreteIrrigationSectorBuilder&							produceBinaryPumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, \
+																const uint32_t& _runtime_limit_seconds, const struct gpio_s& _pinout, const struct gpio_s& _led) override;
 	std::unique_ptr<IrrigationSector>							GetProduct();
 };
 

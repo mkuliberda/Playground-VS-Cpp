@@ -48,197 +48,6 @@ void decodePumpStatus(std::array<struct PumpInfo_s, 4> & a_pump, const std::bits
 	}
 }
 
-
-/***********************************/
-/*! PumpController class implementation */
-/***********************************/
-
-bool PumpController::update(const double& _dt, bool& _activate_watering) {
-
-	bool consumed = false;
-	bool fault = false;
-	std::bitset<8> errcode;
-	/*******errcode**********
-	 * 00000000
-	 * ||||||||->(0) 1 if cmd not consumed
-	 * |||||||-->(1) 1 if active, 0 if stopped
-	 * ||||||--->(2) 1 if runtime timeout
-	 * |||||---->(3) 1 if fault occurred at least once
-	 * ||||----->(4)
-	 * |||------>(5) 1 if none of avbl pumps was correctly initialized/created
-	 * ||------->(6) 1 if controller is in wrong or not avbl mode
-	 * |-------->(7) 1 if pumps_count is 0
-	 *************************/
-
-	if (this->pumps_count > 0)
-	{
-		switch (this->mode)
-		{
-
-		case pumpcontrollermode_t::init:
-			std::cout << "PumpCtrl init" << std::endl;
-			errcode.set(6, true);
-			break;
-
-		case pumpcontrollermode_t::external:
-			std::cout << "PumpCtrl external" << std::endl;
-			/*if (this->pBinPump != nullptr)
-			{
-				std::cout << "PumpCtrl pBinPump != nullptr" << std::endl;
-				if (_activate_watering)
-				{
-					this->pBinPump->run(_dt, pump_cmd_t::start, consumed);
-					if (consumed == false) errcode.set(0, true);
-				}
-				else
-				{
-					this->pBinPump->run(_dt, pump_cmd_t::stop, consumed);
-					if (consumed == false) errcode.set(0, true);
-				}
-			}
-			else if (this->p8833Pump != nullptr)
-			{
-				std::cout << "PumpCtrl p8833Pump != nullptr" << std::endl;
-				if (_activate_watering == true && this->p8833Pump->getState() != pump_state_t::waiting)
-				{
-					this->p8833Pump->run(_dt, pump_cmd_t::start, consumed, fault);
-					if (consumed == false) errcode.set(0, true);
-				}
-				else if (_activate_watering == true && this->p8833Pump->getState() == pump_state_t::waiting)
-				{
-					this->p8833Pump->run(_dt, pump_cmd_t::stop, consumed, fault);
-					if (consumed == false) errcode.set(0, true);
-					errcode.set(2, true); //runtime timeout
-					_activate_watering = false;
-				}
-				else if (_activate_watering == false)
-				{
-					this->p8833Pump->run(_dt, pump_cmd_t::stop, consumed, fault); TODO: impelment after refactor
-				}
-			}
-			else errcode.set(5, true);*/
-
-			break;
-
-		case pumpcontrollermode_t::manual:
-			errcode.set(6, true);
-			break;
-
-		case pumpcontrollermode_t::automatic:
-			errcode.set(6, true);
-			break;
-
-		case pumpcontrollermode_t::sleep:
-			errcode.set(6, true);
-			break;
-
-		default:
-			errcode.set(6, true);
-			break;
-		}
-
-		/*if (this->pBinPump != nullptr)
-		{
-			if (this->pBinPump->getState() == pump_state_t::running) errcode.set(1, true);
-		}
-		else if (this->p8833Pump != nullptr)
-		{
-			if (this->p8833Pump->getState() == pump_state_t::running) errcode.set(1, true);
-		} TODO: implement after refactor*/ 
-
-		if (fault == true) {
-			if (++this->pump_fault_occurence_cnt > 0) errcode.set(3, true);
-		}
-
-	}
-	else errcode.set(7, true);
-
-	this->pump_encoded_status = static_cast<uint8_t>(errcode.to_ulong());
-
-	return consumed;
-}
-
-bool PumpController::createPump(const pump_type_t & _pumptype) {
-
-	bool success = true;
-
-	switch (_pumptype) {
-	case pump_type_t::binary:
-		if (this->pumps_count < (this->pumps_limit + 1))
-		{
-			//this->pBinPump = new BinaryPump(); TODO: implement after refactor
-			this->pumps_count++;
-		}
-		else
-		{
-			std::cout << "Pump count limit reached" << std::endl;
-			success = false;
-		}
-		break;
-
-	case pump_type_t::generic:
-		success = false;
-		break;
-
-	case pump_type_t::drv8833_dc:
-		if (this->pumps_count < (this->pumps_limit + 1))
-		{
-			//this->p8833Pump = new DRV8833Pump(motortype_t::dc_motor);  TODO:implement after refactor
-			this->pumps_count++;
-		}
-		else
-		{
-			std::cout << "Pump count limit reached" << std::endl;
-			success = false;
-		}
-		break;
-
-	case pump_type_t::drv8833_bldc:
-		if (this->pumps_count < (this->pumps_limit + 1))
-		{
-			//this->p8833Pump = new DRV8833Pump(motortype_t::bldc_motor); TODO: implement after refactor
-			this->pumps_count++;
-		}
-		else
-		{
-			std::cout << "Pump count limit reached" << std::endl;
-			success = false;
-		}
-		break;
-
-	default:
-		std::cout << "Incorrect pump type" << std::endl;
-		success = false;
-		break;
-	}
-
-	return success;
-}
-
-bool PumpController::setMode(const pumpcontrollermode_t & _mode) {
-
-	bool changed = true;
-
-	if (this->mode != _mode && _mode != pumpcontrollermode_t::init)
-	{
-		this->mode = _mode;
-	}
-	else changed = false;
-
-	return changed;
-}
-
-const pumpcontrollermode_t&	PumpController::getMode(void) {
-	return this->mode;
-}
-
-uint8_t& PumpController::getPumpStatusEncoded(void) {
-	return this->pump_encoded_status;
-}
-
-
-
-
 //Pumps based on bridge pattern (WIP)
 
 bool PumpImp::isValid() const {
@@ -283,26 +92,15 @@ bool PumpImp::init(const uint32_t& _idletime_required_seconds, const uint32_t& _
 	this->idletime_required_seconds = _idletime_required_seconds;
 	this->idletime_seconds = this->idletime_required_seconds;
 	this->runtime_limit_seconds = _runtime_limit_seconds;
-	this->setState(pump_state_t::stopped);
+	this->stop();
 
 	return true;
 }
 
-//bool PumpImp::init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
-//	const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
-//	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) {
-//
-//	this->idletime_required_seconds = _idletime_required_seconds;
-//	this->idletime_seconds = this->idletime_required_seconds;
-//	this->runtime_limit_seconds = _runtime_limit_seconds;
-//	this->setState(pump_state_t::stopped);
-//
-//	return true;
-//}
-
-void PumpImp::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) {
+bool PumpImp::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) { //TODO: implement generic algorithm
 	std::cout << "PumpImp run" << std::endl;
-	cmd_consumed = false;
+	cmd_consumed = true;
+	return true;
 }
 
 void PumpImp::setState(const pump_state_t& _state) {
@@ -347,6 +145,7 @@ double PumpImp::getIdletimeSeconds(void) const{
 }
 
 
+
 bool Pump::isValid() const {
 	return imp_->isValid();
 }
@@ -367,14 +166,8 @@ bool Pump::init(const uint32_t& _idletime_required_seconds, const uint32_t& _run
 	return imp_->init(_idletime_required_seconds, _runtime_limit_seconds);
 }
 
-//bool Pump::init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
-//	const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
-//	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout){
-//	return imp_->init(_idletime_required_seconds, _runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout);
-//}
-
-void Pump::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) {
-	imp_->run(_dt, cmd_consumed, _cmd);
+bool Pump::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) {
+	return imp_->run(_dt, cmd_consumed, _cmd);
 }
 
 void Pump::setState(const pump_state_t& _state) {
@@ -462,18 +255,406 @@ bool DRV8833DcPumpImp::isFault(void) {
 	return HAL_GPIO_ReadPin(this->fault.port, this->fault.pin) == GPIO_PIN_RESET ? true : false;
 }
 
-void DRV8833DcPumpImp::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) {
-	std::cout << "DRV8833DcPumpImp run" << std::endl;
+bool DRV8833DcPumpImp::run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd) {
 	cmd_consumed = false;
+	bool fault = false;
+
+	if (this->isFault() == true) this->setState(pump_state_t::fault);
+
+	switch (this->getState()) {
+	case pump_state_t::init:
+		this->setState(pump_state_t::stopped);
+		if (_cmd == pump_cmd_t::stop) cmd_consumed = true;
+		else cmd_consumed = false;
+		break;
+
+	case pump_state_t::waiting:
+		this->increaseIdletime(_dt);
+		if (this->getIdletimeSeconds() > this->idletime_required_seconds) {
+			if (_cmd == pump_cmd_t::start) this->start();
+			else this->stop();
+			cmd_consumed = true;
+		}
+		break;
+
+	case pump_state_t::stopped:
+		this->increaseIdletime(_dt);
+		if (_cmd == pump_cmd_t::start) {
+			if (this->getIdletimeSeconds() > this->idletime_required_seconds) {
+				this->start();
+				cmd_consumed = true;
+			}
+			else if (this->getIdletimeSeconds() <= this->idletime_required_seconds) {
+				this->setState(pump_state_t::waiting);
+			}
+		}
+		else {
+			cmd_consumed = true;
+		}
+		break;
+
+	case pump_state_t::running:
+		this->increaseRuntime(_dt);
+		if (_cmd == pump_cmd_t::start) {
+			cmd_consumed = true;
+		}
+		else if (_cmd == pump_cmd_t::stop) {
+			this->stop();
+			cmd_consumed = true;
+		}
+		else {
+			this->stop();
+			cmd_consumed = false;
+		}
+		if (this->getRuntimeSeconds() > this->runtime_limit_seconds && this->status.forced == false) this->stop(); //TODO: how to handle force.... commands?
+		break;
+
+	case pump_state_t::reversing:
+		this->increaseRuntime(_dt);
+		if (_cmd == pump_cmd_t::start) {
+			this->start();
+			cmd_consumed = true;
+		}
+		else {
+			cmd_consumed = true;
+		}
+		if (this->getRuntimeSeconds() > 30.0 && this->status.forced == false) this->stop(); //TODO: how to handle force.... commands?
+		break;
+
+	case pump_state_t::fault:
+		fault = true;
+		this->increaseIdletime(_dt);
+		this->stop(); //TODO: or forcestop?
+		if (_cmd == pump_cmd_t::stop) cmd_consumed = true;
+		else cmd_consumed = false;
+		break;
+
+	case pump_state_t::sleep:
+		this->increaseIdletime(_dt);
+		this->stop(); //TODO: or forcestop?
+		if (_cmd == pump_cmd_t::stop) cmd_consumed = true;
+		else cmd_consumed = false;
+		break;
+
+	default:
+		break;
+	}
+
+	std::cout << "DRV8833DcPumpImp run "  << ", " << this->runtime_seconds << ", " << this->runtime_limit_seconds << std::endl;
+
+	return fault;
+
+}
+
+bool DRV8833DcPumpImp::start(void) {
+
+	bool success = false;
+	this->status.forced = false;
+
+	if (this->isRunning() == false) {
+		this->resetIdletime();
+		this->resetRuntime();
+
+		HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_SET);
+		success = true;
+
+	}
+
+	this->setState(pump_state_t::running);
+
+	return success;
+}
+
+bool DRV8833DcPumpImp::stop(void) {
+
+	bool success = false;
+	this->status.forced = false;
+
+	if (this->isRunning() == true) {
+		this->resetIdletime();
+		this->resetRuntime();
+
+		HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_RESET);
+		success = true;
+
+	}
+
+	this->setState(pump_state_t::stopped);
+
+	return success;
+}
+
+bool DRV8833DcPumpImp::reverse(void) {
+
+	bool success = false;
+	this->status.forced = false;
+
+	this->resetIdletime();
+	this->resetRuntime();
+
+	HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_SET);
+	success = true;
+
+	this->setState(pump_state_t::reversing);
+
+	return success;
+}
+
+bool DRV8833DcPumpImp::forcestart(void) {
+
+	bool success = true;
+	this->status.forced = true;
+
+	HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_SET);
+	this->setState(pump_state_t::running);
+
+	if (this->isRunning() == false) {
+		this->resetRuntime();
+	}
+	else {
+		success = false;
+	}
+
+	return success;
+}
+bool DRV8833DcPumpImp::forcestop(void) {
+
+	bool success = true;
+	this->status.forced = true;
+
+	HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_RESET);
+	this->setState(pump_state_t::stopped);
+
+	if (this->isRunning() == true) {
+		this->resetIdletime();
+	}
+	else {
+		success = false;
+	}
+
+	return success;
+}
+
+bool DRV8833DcPumpImp::forcereverse(void) {
+
+	bool success = true;
+	this->status.forced = true;
+
+	HAL_GPIO_WritePin(this->aIN[0].port, this->aIN[0].pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(this->aIN[1].port, this->aIN[1].pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(this->led.port, this->led.pin, GPIO_PIN_SET);
+	this->setState(pump_state_t::reversing);
+
+	if (this->isRunning() == false) {
+		this->resetRuntime();
+	}
+	else {
+		success = false;
+	}
+
+	return success;
+}
+
+void DRV8833DcPumpImp::setSleep(void) {
+	this->stop();
+	HAL_GPIO_WritePin(this->mode.port, this->mode.pin, GPIO_PIN_RESET);
+	this->setState(pump_state_t::sleep);
 }
 
 
-//bool DRV8833DcPump::init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
-//	const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
-//	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) {
-//	
-//	return imp_->init(_idletime_required_seconds, _runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout);
-//}
+/***********************************/
+/*! PumpController class implementation */
+/***********************************/
+
+bool PumpController::update(const double& _dt, bool& _activate_watering) {
+
+	bool consumed = false;
+	bool fault = false;
+	std::bitset<8> errcode;
+	/*******errcode**********
+	 * 00000000
+	 * ||||||||->(0) 1 if cmd not consumed
+	 * |||||||-->(1) 1 if active, 0 if stopped
+	 * ||||||--->(2) 1 if runtime timeout
+	 * |||||---->(3) 1 if fault occurred at least once
+	 * ||||----->(4)
+	 * |||------>(5) 1 if none of avbl pumps was correctly initialized/created
+	 * ||------->(6) 1 if controller is in wrong or not avbl mode
+	 * |-------->(7) 1 if pumps_count is 0
+	 *************************/
+
+	if (this->pumps_count > 0)
+	{
+		switch (this->mode)
+		{
+
+		case pump_controller_mode_t::init:
+			std::cout << "PumpCtrl init" << std::endl;
+			errcode.set(6, true);
+			break;
+
+		case pump_controller_mode_t::external:
+			std::cout << "PumpCtrl external" << std::endl;
+			if (pPump != nullptr)
+			{
+				std::cout << "PumpCtrl pPump != nullptr" << std::endl;
+				if (_activate_watering == true && pPump->getState() != pump_state_t::waiting)
+				{
+					fault = pPump->run(_dt, consumed, pump_cmd_t::start);
+					if (consumed == false) errcode.set(0, true);
+				}
+				else if (_activate_watering == true && pPump->getState() == pump_state_t::waiting)
+				{
+					fault = pPump->run(_dt, consumed, pump_cmd_t::stop);
+					if (consumed == false) errcode.set(0, true);
+					errcode.set(2, true); //runtime timeout
+					_activate_watering = false;
+				}
+				else if (_activate_watering == false)
+				{
+					fault = pPump->run(_dt, consumed, pump_cmd_t::stop); //TODO: impelment after refactor
+				}
+			}
+			else errcode.set(5, true);
+			break;
+
+		case pump_controller_mode_t::manual:
+			errcode.set(6, true);
+			break;
+
+		case pump_controller_mode_t::automatic:
+			errcode.set(6, true);
+			break;
+
+		case pump_controller_mode_t::sleep:
+			errcode.set(6, true);
+			break;
+
+		default:
+			errcode.set(6, true);
+			break;
+		}
+
+		if (pPump != nullptr) {
+			if (pPump->getState() == pump_state_t::running) errcode.set(1, true);
+		}
+
+		if (fault == true) {
+			if (++this->pump_fault_occurence_cnt > 0) errcode.set(3, true);
+		}
+
+	}
+	else errcode.set(7, true);
+
+	this->pump_encoded_status = static_cast<uint8_t>(errcode.to_ulong());
+
+	return consumed;
+}
+
+bool PumpController::createPump(const pump_type_t& _pump_type, const uint8_t& _id, const uint32_t& _idletime_required_seconds, \
+	const uint32_t& _runtime_limit_seconds, const std::array<struct gpio_s, 4>& _pinout, const struct gpio_s& _led_pinout, \
+	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) {
+
+	bool success = true;
+
+	switch (_pump_type) {
+
+	case pump_type_t::drv8833_dc:
+		if (this->pumps_count < (this->pumps_limit + 1))
+		{
+			const std::array<struct gpio_s, 2> pins = { _pinout[0], _pinout[1] };
+			pPump = new DRV8833DcPump(_id, _idletime_required_seconds, _runtime_limit_seconds, pins, _led_pinout, _fault_pinout, _mode_pinout);
+			this->pumps_count++;
+		}
+		else
+		{
+			std::cout << "Pump count limit reached" << std::endl;  //TODO: delete on STM32
+			success = false;
+		}
+		break;
+
+	case pump_type_t::drv8833_bldc:
+		if (this->pumps_count < (this->pumps_limit + 1))
+		{
+			std::cout << "drv8833_bldc pump not implemented yet" << std::endl; //TODO: delete on STM32
+			//this->pumps_count++;
+			success = false; //TODO: not implemented yet
+		}
+		else
+		{
+			std::cout << "Pump count limit reached" << std::endl;
+			success = false;
+		}
+		break;
+
+	case pump_type_t::binary:
+		if (this->pumps_count < (this->pumps_limit + 1))
+		{
+			std::cout << "Binary pump not implemented yet" << std::endl; //TODO: delete on STM32
+			//this->pumps_count++;
+			success = false; //TODO: not implemented yet
+		}
+		else
+		{
+			std::cout << "Pump count limit reached" << std::endl; //TODO: delete on STM32
+			success = false;
+		}
+		break;
+
+	case pump_type_t::generic:
+		if (this->pumps_count < (this->pumps_limit + 1))
+		{
+			pPump = new Pump(_id, _idletime_required_seconds, _runtime_limit_seconds);
+			this->pumps_count++;
+		}
+		else
+		{
+			std::cout << "Pump count limit reached" << std::endl; //TODO: delete on STM32
+			success = false;
+		}
+		break;
+
+	default:
+		std::cout << "Incorrect pump type" << std::endl;
+		success = false;
+		break;
+	}
+
+	return success;
+
+}
+
+bool PumpController::setMode(const pump_controller_mode_t & _mode) {
+
+	bool changed = true;
+
+	if (this->mode != _mode && _mode != pump_controller_mode_t::init)
+	{
+		this->mode = _mode;
+	}
+	else changed = false;
+
+	return changed;
+}
+
+const pump_controller_mode_t&	PumpController::getMode(void) {
+	return this->mode;
+}
+
+uint8_t& PumpController::getPumpStatusEncoded(void) {
+	return this->pump_encoded_status;
+}
+
 
 
 

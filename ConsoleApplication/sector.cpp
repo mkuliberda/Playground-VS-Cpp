@@ -106,24 +106,35 @@ ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::producePlantWi
 	return *this;
 }
 
-ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
+ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
 	const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout,
 	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout){
 
 	sector->pump_controller.setMode(_controller_mode);
-	if (sector->pump_controller.createPump(pump_type_t::drv8833_dc) == true) {
-		/*sector->pump_controller.p8833Pump->init(0, _idletime_required_seconds,
-			_runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout); TODO: correct after pumps refactor*/
-		sector->parts_.push_back("DRV8833Pump");  //TODO: delete this on STM32
+	const std::array<struct gpio_s, 4> pins = { _pinout[0], _pinout[1], 0, 0 };
+	if (sector->pump_controller.createPump(pump_type_t::drv8833_dc, PumpId++, _idletime_required_seconds, _runtime_limit_seconds, pins, _led_pinout, _fault_pinout, _mode_pinout) == true) {
+		sector->parts_.push_back("DRV8833DcPump");  //TODO: delete this on STM32
 	}
 	return *this;
 }
 
-ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::producePumpWithController(const pumpcontrollermode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
+ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::produceDRV8833PumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
+	const std::array<struct gpio_s, 4>& _pinout, const struct gpio_s& _led_pinout,
+	const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout) {
+
+	sector->pump_controller.setMode(_controller_mode);
+	if (sector->pump_controller.createPump(pump_type_t::drv8833_dc, PumpId++, _idletime_required_seconds, _runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout) == true) {
+		sector->parts_.push_back("DRV8833BldcPump");  //TODO: delete this on STM32
+	}
+	return *this;
+}
+
+ConcreteIrrigationSectorBuilder& ConcreteIrrigationSectorBuilder::produceBinaryPumpWithController(const pump_controller_mode_t& _controller_mode, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
 	const struct gpio_s& _pinout, const struct gpio_s& _led){
 
 	sector->pump_controller.setMode(_controller_mode);
-	if (this->sector->pump_controller.createPump(pump_type_t::binary) == true) {
+	const std::array<struct gpio_s, 4> pins = { _pinout, 0, 0, 0 };
+	if (this->sector->pump_controller.createPump(pump_type_t::binary, PumpId++, _idletime_required_seconds, _runtime_limit_seconds, pins, _led) == true) {
 		/*this->sector->pump_controller.pBinPump->init(0, _idletime_required_seconds,
 			_runtime_limit_seconds, _pinout, _led); TODO: correct after pumps refactor*/
 		this->sector->parts_.push_back("BinaryPump");  //TODO: delete this on STM32

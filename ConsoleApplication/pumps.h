@@ -7,6 +7,7 @@
 #include <iostream>
 #include <chrono> //TODO: use UDLs for time counting and duration?
 
+static uint8_t PumpId = 0;
 
 struct PumpInfo_s {
 	uint32_t	state = 0;
@@ -44,7 +45,7 @@ enum class pump_cmd_t {
 };
 
 
-enum class pumpcontrollermode_t {
+enum class pump_controller_mode_t {
 	init,
 	automatic,
 	manual,
@@ -56,55 +57,20 @@ void encodePumpStatus(const struct PumpInfo_s& _pump, uint32_t& status);
 void decodePumpStatus(std::array<struct PumpInfo_s, 4>& a_pump, const std::bitset<32>& _status);
 
 
-class PumpController {
-
-private:
-
-	const uint8_t 						pumps_limit = 1;
-	uint8_t								pumps_count;
-	pumpcontrollermode_t				mode;
-	uint8_t								pump_encoded_status;
-	uint32_t							pump_fault_occurence_cnt;
-
-public:
-
-	PumpController() :
-		pumps_count(0),
-		mode(pumpcontrollermode_t::init),
-		pump_encoded_status(255),
-		pump_fault_occurence_cnt(0)
-	{};
-
-	~PumpController()
-	{ 
-		//if (pBinPump != nullptr) delete pBinPump;
-		//if (p8833Pump != nullptr) delete p8833Pump;
-	};
-
-	//BinaryPump							*pBinPump = nullptr; //TODO: implement Pumps as bridge/decorator design pattern?
-	//DRV8833Pump							*p8833Pump = nullptr; //TODO: implement Pumps as bridge/decorator design pattern?
-
-	bool								update(const double & _dt, bool & _activate_watering);
-	bool								createPump(const pump_type_t & _pumptype);
-	bool								setMode(const pumpcontrollermode_t & _mode);
-	const pumpcontrollermode_t&			getMode(void);
-	uint8_t&							getPumpStatusEncoded(void);
-
-
-};
-
 //Pumps based on Bridge Pattern (WIP)
 
 class PumpImp {
 public:
-	PumpImp(const uint8_t& _id, const pump_type_t& _type) {
+	PumpImp(const uint8_t& _id, const pump_type_t& _type, const uint32_t& _idletime_required_seconds = 0, const uint32_t& _runtime_limit_seconds = 4294967295) {
 		type = _type;
 		status.id = _id;
+		init(_idletime_required_seconds, _runtime_limit_seconds);
 		std::cout << "PumpImp standard constructor " << std::endl;//TODO: delete on STM32
 	}
-	PumpImp(const uint8_t&& _id, const pump_type_t&& _type) {
+	PumpImp(const uint8_t&& _id, const pump_type_t&& _type, const uint32_t&& _idletime_required_seconds = 0, const uint32_t&& _runtime_limit_seconds = 4294967295) {
 		type = std::move(_type);
 		status.id = std::move(_id);
+		init(std::move(_idletime_required_seconds), std::move(_runtime_limit_seconds));
 		std::cout << "PumpImp move constructor " << std::endl;//TODO: delete on STM32
 	}
 	~PumpImp() {
@@ -119,7 +85,7 @@ public:
 	virtual bool 						start();
 	virtual bool 						stop();
 	virtual bool						init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds);
-	virtual void						run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd = pump_cmd_t::stop);
+	virtual bool						run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd = pump_cmd_t::stop);
 	virtual void 						setState(const pump_state_t& _state);
 	virtual pump_state_t				getState(void) const;
 	virtual bool						isRunning(void) const;
@@ -179,7 +145,7 @@ protected:
 
 class DRV8833DcPumpImp : public PumpImp {
 public:
-	DRV8833DcPumpImp(const uint8_t& _id, const uint32_t & _idletime_required_seconds, const uint32_t & _runtime_limit_seconds, \
+	DRV8833DcPumpImp(const uint8_t& _id, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
 		const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
 		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout, \
 		const pump_type_t& _type = pump_type_t::drv8833_dc) : PumpImp(_id, _type) {
@@ -207,21 +173,25 @@ public:
 	DRV8833DcPumpImp(DRV8833DcPumpImp const &) = delete;
 	DRV8833DcPumpImp& operator=(DRV8833DcPumpImp const&) = delete;
 
-	virtual void					run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd = pump_cmd_t::stop);
+	bool							run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd = pump_cmd_t::stop);
 	bool							init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
 										const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
 										const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout);
 	void							setEnable(void);
 	bool							isFault(void);
-
+	bool 							start();
+	bool 							stop();
+	bool							reverse();
+	bool							forcestart();
+	bool							forcestop();
+	bool							forcereverse();
+	void							setSleep();
 
 protected:
 	std::array<struct gpio_s, 2> 	aIN;							///< in1, in2
 	struct gpio_s 					led;
 	struct gpio_s 					fault;
 	struct gpio_s 					mode;
-
-	char zone_[3] = "-1";//TODO: delete on STM32
 
 };
 
@@ -255,14 +225,16 @@ protected:
 
 class Pump {
 public:
-	Pump() {}
-	Pump(const uint8_t& _id, const pump_type_t& _type) {
+	Pump() {
+		std::cout << "Pump default constructor " << std::endl;//TODO: delete on STM32
+	}; //required default constructor
+	Pump(const uint8_t& _id, const uint32_t& _idletime_required_seconds = 0, const uint32_t& _runtime_limit_seconds = 4294967295, const pump_type_t& _type = pump_type_t::generic) {
 		std::cout << "Pump standard constructor " << std::endl;//TODO: delete on STM32
-		imp_ = new PumpImp(_id, _type);
+		imp_ = new PumpImp(_id, _type, _idletime_required_seconds, _runtime_limit_seconds);
 	}
-	Pump(const uint8_t&& _id, const pump_type_t&& _type) {
+	Pump(const uint8_t&& _id, const uint32_t&& _idletime_required_seconds = 0, const uint32_t&& _runtime_limit_seconds = 4294967295, const pump_type_t& _type = pump_type_t::generic) {
 		std::cout << "Pump move constructor " << std::endl;//TODO: delete on STM32
-		imp_ = new PumpImp(std::move(_id), std::move(_type));
+		imp_ = new PumpImp(std::move(_id), std::move(_type), std::move(_idletime_required_seconds), std::move(_runtime_limit_seconds));
 	}
 	~Pump() {
 		std::cout << "Pump dtor " << std::endl;//TODO: delete on STM32
@@ -277,7 +249,7 @@ public:
 	virtual bool 						start();
 	virtual bool 						stop();
 	virtual bool						init(const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds);
-	virtual void						run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd);
+	virtual bool						run(const double& _dt, bool& cmd_consumed, const pump_cmd_t& _cmd);
 	virtual void 						setState(const pump_state_t& _state);
 	virtual pump_state_t				getState(void) const;
 	virtual bool						isRunning(void) const;
@@ -313,16 +285,18 @@ public:
 
 class DRV8833DcPump : public Pump {
 public:
-	DRV8833DcPump(const uint8_t& _id, const uint32_t & _idletime_required_seconds, const uint32_t & _runtime_limit_seconds, \
+	DRV8833DcPump(const uint8_t& _id, const uint32_t& _idletime_required_seconds, const uint32_t& _runtime_limit_seconds, \
 		const std::array<struct gpio_s, 2>& _pinout, const struct gpio_s& _led_pinout, \
 		const struct gpio_s& _fault_pinout, const struct gpio_s& _mode_pinout, \
 		const pump_type_t& _type = pump_type_t::drv8833_dc) {
+		std::cout << "DRV8833DcPump standard constructor " << std::endl;//TODO: delete on STM32
 		imp_ = new DRV8833DcPumpImp(_id, _idletime_required_seconds, _runtime_limit_seconds, _pinout, _led_pinout, _fault_pinout, _mode_pinout);
 	}
 	DRV8833DcPump(const uint8_t&& _id, const uint32_t && _idletime_required_seconds, const uint32_t && _runtime_limit_seconds, \
 		const std::array<struct gpio_s, 2>&& _pinout, const struct gpio_s&& _led_pinout, \
 		const struct gpio_s&& _fault_pinout, const struct gpio_s&& _mode_pinout, \
 		const pump_type_t&& _type = pump_type_t::drv8833_dc) {
+		std::cout << "DRV8833DcPump move constructor " << std::endl;//TODO: delete on STM32
 		imp_ = new DRV8833DcPumpImp(std::move(_id), std::move(_idletime_required_seconds), std::move(_runtime_limit_seconds), std::move(_pinout), std::move(_led_pinout), std::move(_fault_pinout), std::move(_mode_pinout));
 	}
 	~DRV8833DcPump() {
@@ -349,4 +323,42 @@ public:
 	DRV8833BldcPump(DRV8833BldcPump const&) = delete;
 	DRV8833BldcPump& operator=(DRV8833BldcPump const&) = delete;
 };*/
+
+class PumpController {
+
+private:
+
+	const uint8_t 						pumps_limit = 1;
+	uint8_t								pumps_count;
+	pump_controller_mode_t				mode;
+	uint8_t								pump_encoded_status;
+	uint32_t							pump_fault_occurence_cnt;
+
+public:
+
+	PumpController() :
+		pumps_count(0),
+		mode(pump_controller_mode_t::init),
+		pump_encoded_status(255),
+		pump_fault_occurence_cnt(0)
+	{};
+
+	~PumpController()
+	{
+		if (pPump != nullptr) delete pPump;
+	};
+
+	Pump *pPump = nullptr;
+
+	bool								update(const double & _dt, bool & _activate_watering);
+	bool								createPump(const pump_type_t& _pump_type, const uint8_t& _id, const uint32_t& _idletime_required_seconds = 0, \
+										const uint32_t& _runtime_limit_seconds = 4294967295, const std::array<struct gpio_s, 4>& _pinout = { 0, 0, 0, 0 }, \
+										const struct gpio_s& _led_pinout = { 0, 0 }, const struct gpio_s& _fault_pinout = { 0, 0 }, \
+										const struct gpio_s& _mode_pinout = { 0, 0 });
+	bool								setMode(const pump_controller_mode_t & _mode);
+	const pump_controller_mode_t&		getMode(void);
+	uint8_t&							getPumpStatusEncoded(void);
+
+
+};
 

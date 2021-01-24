@@ -55,6 +55,7 @@ void builder_test(void) {
 	uint32_t error_code = 0;
 	TIM_HandleTypeDef Timer;
 	TIM_HandleTypeDef *pTimer = &Timer;
+	bool activate_watering1 = true;
 
 
 	ConcreteIrrigationSectorBuilder* sector_builder = new ConcreteIrrigationSectorBuilder; //leave as pointer to delete when not needed anymore
@@ -68,7 +69,7 @@ void builder_test(void) {
 	sector_builder->ProducePartC();
 	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia");
 	sector_builder->producePlantWithDMAMoistureSensor("Kroton");
-	sector_builder->producePumpWithController(pumpcontrollermode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
+	sector_builder->produceDRV8833PumpWithController(pump_controller_mode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
 	std::unique_ptr<IrrigationSector>(p_sector2);
 	p_sector2 = sector_builder->GetProduct();
 
@@ -86,6 +87,7 @@ void builder_test(void) {
 	p_sector2->update();
 	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "-----------------------------setPlantMoistureByName success"  << std::endl;
 	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
+	p_sector2->pump_controller.update(0.02, activate_watering1);
 
 	ConcreteWatertankBuilder* watertank_builder = new ConcreteWatertankBuilder; //leave as pointer to delete when not needed anymore
 	watertank_builder->setWatertankHeight(75.7_cm);
@@ -119,12 +121,10 @@ void controller_test(bool _watering, const double& _dt) {
 	const struct gpio_s pump1fault = { 0, 2 };
 	const struct gpio_s pump1mode = { 0, 3 };
 
-	/*PumpController controller1;
-	controller1.setMode(pumpcontrollermode_t::external);
-	controller1.createPump(pumptype_t::drv8833_dc);
-	controller1.p8833Pump->init(0, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
-
-	controller1.update(_dt, _watering);*/
+	PumpController controller1;
+	controller1.setMode(pump_controller_mode_t::external);
+	controller1.createPump(pump_type_t::drv8833_dc, PumpId++, 10, 30, { pump1gpio_in1, pump1gpio_in2, 0, 0}, pump1led, pump1fault, pump1mode);
+	controller1.update(_dt, _watering);
 }
 
 void bridge_test() {
@@ -165,7 +165,7 @@ void bridge_test() {
 	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
 	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "-----------------------------vSensors waterflow sensor" << std::endl;
 
-	Pump *pump0 = new Pump(0, pump_type_t::generic);
+	Pump *pump0 = new Pump(0);
 	Pump *pump1 = new DRV8833DcPump(1, 10, 30, { 0,1 }, { 5,1 }, { 1,1 }, { 2,1 });
 	bool cmd_consumed = false;
 	pump0->run(0.02, cmd_consumed, pump_cmd_t::start);
@@ -185,7 +185,7 @@ int main()
 	bool watering = false;
 
 	while (1) {
-		//decorator_test();
+		decorator_test();
 		builder_test();
 		bridge_test();
 
@@ -195,7 +195,7 @@ int main()
 			dt = 0;
 			watering = true;
 		}
-		//controller_test(watering, 1);
+		controller_test(watering, 1);
 
 		if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
