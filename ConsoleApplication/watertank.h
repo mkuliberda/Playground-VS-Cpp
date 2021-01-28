@@ -4,6 +4,7 @@
 #include <iostream> //TODO: delete on STM32
 #include <vector>
 #include <string>
+#include "hysteresis.h"
 
 #define W_SUCCESS		(uint8_t)1
 #define W_FAIL			(uint8_t)0
@@ -41,6 +42,7 @@ inline double operator"" _K(long double k) {
 	return k - 273.15;
 }
 
+
 struct WatertankInfo_s {
 	uint32_t	errors;
 	uint8_t		water_level;
@@ -58,8 +60,6 @@ struct WatertankInfo_s {
 
 class Watertank {
 private:
-
-	struct WatertankInfo_s								watertank_info;
 
 	enum class contentstate_t : uint8_t {
 		unknown = 255,
@@ -83,9 +83,15 @@ private:
 		full = 100
 	};
 
+	struct WatertankInfo_s								watertank_info;
+
+	Hysteresis water_level_hysteresis;
+
 	float								mean_water_temperature_celsius;
 	contentlevel_t						water_level;
 	contentstate_t 						water_state;
+	double								water_level_low_delay_seconds;
+	double								water_level_low_elapsed_seconds;
 	double	 							tank_height_meters;
 	double		 						tank_volume_liters;
 	uint8_t								fixed_water_level_sensors_count;
@@ -102,11 +108,12 @@ public:
 	const uint8_t 						fixed_water_level_sensors_limit;
 	const uint8_t 						temperature_sensors_limit;
 
-	bool 								update(const double& _dt, uint32_t&  errcodeBitmask);
+	bool 								update(const double& _dt, uint32_t&  errcode_bitmask);
 	float& 								getWaterTemperatureCelsius(void);
 	float 								getWaterTemperatureKelvin(void);
 	float 								getWaterTemperatureFahrenheit(void);
 	uint8_t		 						getWaterLevelPercent(void);
+	void								setWaterLevelHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms);
 	uint8_t&							getId(void);
 	void								setVolume(const double& _volume);
 	void								setHeight(const double& _height); 
@@ -133,6 +140,8 @@ public:
 		mean_water_temperature_celsius(0.0_C),
 		water_level(contentlevel_t::unknown),
 		water_state(contentstate_t::unknown),
+		water_level_low_delay_seconds(0.0_sec),
+		water_level_low_elapsed_seconds(0.0_sec),
 		tank_height_meters(0.0_m),
 		tank_volume_liters(0.0_l),
 		fixed_water_level_sensors_limit(10),

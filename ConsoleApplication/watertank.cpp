@@ -34,9 +34,9 @@ Watertank::contentstate_t& Watertank::getWaterState(void) {
 	return this->water_state;
 }
 
-bool Watertank::update(const double& _dt, uint32_t& errcodeBitmask) {
+bool Watertank::update(const double& _dt, uint32_t& errcode_bitmask) {
 
-	/******************************errcodeBitmask****************************************
+	/******************************errcode_bitmask****************************************
 	 * *Upper 16 bits										Lower 16 bits
 	 * 00000000 00000000 									00000000 00000000
 	 * |||||||| ||||||||->water temperature too low	 (16)	|||||||| ||||||||->(0)
@@ -119,9 +119,15 @@ bool Watertank::update(const double& _dt, uint32_t& errcodeBitmask) {
 	else if (water_level_percent > 30) { this->setWaterLevel(contentlevel_t::above30); errcode.reset(18); }
 	else if (water_level_percent > 20) { this->setWaterLevel(contentlevel_t::above20); errcode.reset(18); }
 	else if (water_level_percent > 10) { this->setWaterLevel(contentlevel_t::above10); errcode.reset(18); }
-	else if (water_level_percent >= 0) { this->setWaterLevel(contentlevel_t::empty); is_ok = false; }
+	else if (water_level_percent >= 0) { 
+		//if ((water_level_low_elapsed_seconds += _dt) > water_level_low_delay_seconds) {
+			this->setWaterLevel(contentlevel_t::empty);
+			is_ok = false;
+		//}
 
-	errcodeBitmask = errcode.to_ulong();
+	}
+
+	errcode_bitmask = errcode.to_ulong();
 
 	return is_ok;
 }
@@ -133,6 +139,12 @@ uint8_t Watertank::waterlevelConvertToPercent(const float& _level_meters) {
 uint8_t Watertank::getWaterLevelPercent(void) {
 	return static_cast<uint8_t>(this->water_level);
 }
+
+void  Watertank::setWaterLevelHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms) {
+	water_level_hysteresis.set_hysteresis_time_from(false, _time_from_false_ms);
+	water_level_hysteresis.set_hysteresis_time_from(true, _time_from_false_ms);
+}
+
 
 uint8_t& Watertank::getId(void) {
 	return this->watertank_info.id;
