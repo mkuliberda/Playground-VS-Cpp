@@ -83,15 +83,14 @@ private:
 		full = 100
 	};
 
-	struct WatertankInfo_s								watertank_info;
+	struct WatertankInfo_s				watertank_info;
 
-	Hysteresis water_level_hysteresis;
+	Hysteresis							tank_state_hysteresis;
 
+	double								abs_time;
 	float								mean_water_temperature_celsius;
 	contentlevel_t						water_level;
 	contentstate_t 						water_state;
-	double								water_level_low_delay_seconds;
-	double								water_level_low_elapsed_seconds;
 	double	 							tank_height_meters;
 	double		 						tank_volume_liters;
 	uint8_t								fixed_water_level_sensors_count;
@@ -108,12 +107,12 @@ public:
 	const uint8_t 						fixed_water_level_sensors_limit;
 	const uint8_t 						temperature_sensors_limit;
 
-	bool 								update(const double& _dt, uint32_t&  errcode_bitmask);
+	bool 								update(const double& _dt);
 	float& 								getWaterTemperatureCelsius(void);
 	float 								getWaterTemperatureKelvin(void);
 	float 								getWaterTemperatureFahrenheit(void);
 	uint8_t		 						getWaterLevelPercent(void);
-	void								setWaterLevelHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms);
+	void								setTankStateHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms);
 	uint8_t&							getId(void);
 	void								setVolume(const double& _volume);
 	void								setHeight(const double& _height); 
@@ -137,11 +136,10 @@ public:
 	}
 
 	Watertank(const uint8_t& _id) :
+		abs_time(0.0_sec),
 		mean_water_temperature_celsius(0.0_C),
 		water_level(contentlevel_t::unknown),
 		water_state(contentstate_t::unknown),
-		water_level_low_delay_seconds(0.0_sec),
-		water_level_low_elapsed_seconds(0.0_sec),
 		tank_height_meters(0.0_m),
 		tank_volume_liters(0.0_l),
 		fixed_water_level_sensors_limit(10),
@@ -154,6 +152,7 @@ public:
 	};
 
 	Watertank(const uint8_t&& _id):
+		abs_time(0.0_sec),
 		mean_water_temperature_celsius(0.0_C),
 		water_level(contentlevel_t::unknown),
 		water_state(contentstate_t::unknown),

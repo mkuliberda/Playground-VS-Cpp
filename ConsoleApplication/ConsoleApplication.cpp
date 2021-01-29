@@ -106,7 +106,7 @@ void builder_test(void) {
 	
 	std::cout << "watertank parts" << std::endl;
 	p_watertank->ListParts();
-	p_watertank->update(0.02, error_code);
+	p_watertank->update(0.02_sec);
 	std::cout << error_code << std::endl;
 	//p_watertank->setHeight(78.0_cm);
 	//std::cout << "literals-----------------" << p_watertank->getHeightMeters() << std::endl;
@@ -184,13 +184,15 @@ Hysteresis tank_delay;
 void hysteresis_test(const double& _abs_time_ms) {
 	bool state = tank_delay.get_state();
 
-	if (_abs_time_ms < 10.0_sec) {
+	if (_abs_time_ms < 9.99_sec) {
 		if (double_equals(_abs_time_ms, 1.0_sec)) {tank_delay.set_state_and_update(true, _abs_time_ms); std::cout << "1000_msec " << std::endl;}
-		else tank_delay.update(_abs_time_ms);
+		if (double_equals(_abs_time_ms, 2.0_sec)) { tank_delay.set_state_and_update(true, _abs_time_ms); std::cout << "2000_msec " << std::endl; }
+		else tank_delay.set_state_and_update(true, _abs_time_ms);
 	}
-	else if (_abs_time_ms >= 10.0_sec && _abs_time_ms < 20.0_sec) {
-		if (double_equals(_abs_time_ms, 10.0_sec, 0.1)) { tank_delay.set_state_and_update(false, _abs_time_ms); std::cout << "10_sec " << std::endl;}
-		else tank_delay.update(_abs_time_ms);
+	else if (_abs_time_ms >= 9.99_sec && _abs_time_ms < 20.0_sec) {
+		if (double_equals(_abs_time_ms, 10.0_sec, 0.01_sec)) { tank_delay.set_state_and_update(false, _abs_time_ms); std::cout << "10_sec " << std::endl;}
+		if (double_equals(_abs_time_ms, 11.0_sec, 0.01_sec)) { tank_delay.set_state_and_update(false, _abs_time_ms); std::cout << "11_sec " << std::endl; }
+		else tank_delay.set_state_and_update(false, _abs_time_ms);
 	}
 
 	std::cout << "time: " << _abs_time_ms << ", state: " << state << std::endl;
@@ -212,7 +214,7 @@ int main()
 		decorator_test();
 		builder_test();
 		bridge_test();
-		hysteresis_test(dt);
+		
 
 		if (dt < 15.0_sec) watering = true;
 		else if (dt >= 15.0_sec && dt < 30.0_sec) watering = false;
@@ -220,12 +222,14 @@ int main()
 			dt = 0.0_sec;
 			watering = true;
 		}
-		//controller_test(watering, 1);
+		controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		//else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
-		dt+=100.0_msec;
+		
 		Sleep(100);
+		dt += 100.0_msec;
+		hysteresis_test(dt);
 	}
 	return 0;
 

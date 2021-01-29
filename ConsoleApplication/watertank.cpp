@@ -34,7 +34,7 @@ Watertank::contentstate_t& Watertank::getWaterState(void) {
 	return this->water_state;
 }
 
-bool Watertank::update(const double& _dt, uint32_t& errcode_bitmask) {
+bool Watertank::update(const double& _dt) {
 
 	/******************************errcode_bitmask****************************************
 	 * *Upper 16 bits										Lower 16 bits
@@ -65,6 +65,8 @@ bool Watertank::update(const double& _dt, uint32_t& errcode_bitmask) {
 	uint8_t water_temperature_readings_count = 0;
 	uint8_t water_level_readings_count = 0;
 	std::bitset<32> errcode; errcode.set();  //initialize bitset and set all bits to 1
+
+	abs_time += _dt;
 
 	for (auto &sensor : vSensors) {
 		switch (sensor->getType()) {
@@ -109,27 +111,25 @@ bool Watertank::update(const double& _dt, uint32_t& errcode_bitmask) {
 	}
 	
 
-	if (water_level_percent >= 98) { this->setWaterLevel(contentlevel_t::full); errcode.reset(18); }
-	else if (water_level_percent > 90) { this->setWaterLevel(contentlevel_t::above90); errcode.reset(18); }
-	else if (water_level_percent > 80) { this->setWaterLevel(contentlevel_t::above80); errcode.reset(18); }
-	else if (water_level_percent > 70) { this->setWaterLevel(contentlevel_t::above70); errcode.reset(18); }
-	else if (water_level_percent > 60) { this->setWaterLevel(contentlevel_t::above60); errcode.reset(18); }
-	else if (water_level_percent > 50) { this->setWaterLevel(contentlevel_t::above50); errcode.reset(18); }
-	else if (water_level_percent > 40) { this->setWaterLevel(contentlevel_t::above40); errcode.reset(18); }
-	else if (water_level_percent > 30) { this->setWaterLevel(contentlevel_t::above30); errcode.reset(18); }
-	else if (water_level_percent > 20) { this->setWaterLevel(contentlevel_t::above20); errcode.reset(18); }
-	else if (water_level_percent > 10) { this->setWaterLevel(contentlevel_t::above10); errcode.reset(18); }
-	else if (water_level_percent >= 0) { 
-		//if ((water_level_low_elapsed_seconds += _dt) > water_level_low_delay_seconds) {
-			this->setWaterLevel(contentlevel_t::empty);
-			is_ok = false;
-		//}
 
-	}
+	if (water_level_percent >= 98) { this->setWaterLevel(contentlevel_t::full); errcode.reset(18);}
+	else if (water_level_percent > 90) { this->setWaterLevel(contentlevel_t::above90); errcode.reset(18);}
+	else if (water_level_percent > 80) { this->setWaterLevel(contentlevel_t::above80); errcode.reset(18);}
+	else if (water_level_percent > 70) { this->setWaterLevel(contentlevel_t::above70); errcode.reset(18);}
+	else if (water_level_percent > 60) { this->setWaterLevel(contentlevel_t::above60); errcode.reset(18);}
+	else if (water_level_percent > 50) { this->setWaterLevel(contentlevel_t::above50); errcode.reset(18);}
+	else if (water_level_percent > 40) { this->setWaterLevel(contentlevel_t::above40); errcode.reset(18);}
+	else if (water_level_percent > 30) { this->setWaterLevel(contentlevel_t::above30); errcode.reset(18);}
+	else if (water_level_percent > 20) { this->setWaterLevel(contentlevel_t::above20); errcode.reset(18);}
+	else if (water_level_percent > 10) { this->setWaterLevel(contentlevel_t::above10); errcode.reset(18);}
+	else if (water_level_percent >= 0) { this->setWaterLevel(contentlevel_t::empty); is_ok = false;}
 
-	errcode_bitmask = errcode.to_ulong();
+	watertank_info.water_level = static_cast<uint8_t>(water_level_percent);
+	watertank_info.errors = errcode.to_ulong();
 
-	return is_ok;
+	tank_state_hysteresis.set_state_and_update(is_ok, abs_time);
+
+	return tank_state_hysteresis.get_state();
 }
 
 uint8_t Watertank::waterlevelConvertToPercent(const float& _level_meters) {
@@ -140,9 +140,9 @@ uint8_t Watertank::getWaterLevelPercent(void) {
 	return static_cast<uint8_t>(this->water_level);
 }
 
-void  Watertank::setWaterLevelHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms) {
-	water_level_hysteresis.set_hysteresis_time_from(false, _time_from_false_ms);
-	water_level_hysteresis.set_hysteresis_time_from(true, _time_from_false_ms);
+void  Watertank::setTankStateHysteresis(const double& _time_from_false_ms, const double& _time_from_true_ms) {
+	tank_state_hysteresis.set_hysteresis_time_from(false, _time_from_false_ms);
+	tank_state_hysteresis.set_hysteresis_time_from(true, _time_from_false_ms);
 }
 
 

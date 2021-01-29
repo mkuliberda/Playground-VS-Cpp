@@ -1,10 +1,5 @@
 #include "hysteresis.h"
-#include <cmath>
 
-/*bool double_equals(double a, double b, double epsilon)
-{
-	return std::abs(a - b) < epsilon;
-}*/
 
 void Hysteresis::set_hysteresis_time_from(const bool _from_state, const double _new_hysteresis_time_ms)
 {
@@ -17,8 +12,7 @@ void Hysteresis::set_hysteresis_time_from(const bool _from_state, const double _
 	}
 }
 
-void
-	Hysteresis::set_state_and_update(const bool _new_state, const double& _now_ms)
+void Hysteresis::set_state_and_update(const bool _new_state, const double& _now_ms)
 {
 	if (_new_state != state) {
 		if (_new_state != requested_state) {
@@ -34,8 +28,7 @@ void
 	update(_now_ms);
 }
 
-void
-	Hysteresis::update(const double& _now_ms)
+void Hysteresis::update(const double& _now_ms)
 {
 	if (requested_state != state) {
 
