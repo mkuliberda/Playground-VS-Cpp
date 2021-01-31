@@ -6,14 +6,16 @@
 #include "plants.h"
 #include "pumps.h"
 
-#define NAME_LENGTH 20
-#define PLANTS_LENGTH 20
+#define PLANT_NAME_LEN 20
+#define PLANT_ALIAS_LEN 4
+#define PLANTS_COUNT_LIMIT 20
+#define PLANTS_FIELD_LEN PLANT_ALIAS_LEN * PLANTS_COUNT_LIMIT + (PLANTS_COUNT_LIMIT-1)
 
 struct IrrigationSectorInfo_s {
 	uint32_t state;
 	uint32_t errors;
 	uint8_t id;
-	char plants[PLANTS_LENGTH];
+	char plants_aliases[PLANTS_FIELD_LEN];
 };
 
 /**
@@ -27,13 +29,14 @@ struct IrrigationSectorInfo_s {
 
 class IrrigationSector{
 private:
-	const uint8_t 										plants_count_limit = 20;
+	const uint8_t 										plants_count_limit = PLANTS_COUNT_LIMIT;
 	const float											plant_dry_level = 10;
 	bool												watering;
 	struct IrrigationSectorInfo_s						sector_info;
 
-	void												encodeErrors() const;
-	void												encodeState() const;
+	void												encodeErrors();
+	void												encodeState();
+	void												encodePlants();
 
 
 public:
@@ -47,7 +50,7 @@ public:
 	float												getPlantHealth(const uint8_t& _id) const;
 	void												setWateringState(const bool& _watering_active);
 	const bool&											getWateringState();
-	void												update() const;
+	void												update();
 	const struct IrrigationSectorInfo_s&				getInfo();
 	void												addPlantNameToList(const std::string&& _plant_name) const;
 	bool												setPlantMoistureByName(const std::string& _plant_name, const float& _moisture_percent) const;

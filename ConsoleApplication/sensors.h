@@ -24,7 +24,7 @@ public:
 		sensor_type = _type;
 		std::cout << "SensorImp standard constructor " << std::endl;//TODO: delete on STM32
 	}
-	~SensorImp() {
+	virtual ~SensorImp() {
 		std::cout << "SensorImp dtor " << std::endl;//TODO: delete on STM32
 	}
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
@@ -132,7 +132,7 @@ public:
 	Sensor(const sensor_type_t&& _type) {
 		imp_ = new SensorImp(std::move(_type));
 	}
-	~Sensor() {
+	virtual ~Sensor() {
 		std::cout << "Sensor dtor " << std::endl;//TODO: delete on STM32
 		delete imp_;
 	}
@@ -167,6 +167,8 @@ public:
 };
 
 class WaterFlowSensor : public Sensor {
+	//frequency calculation = constant 98 * unit flow rate (L / min) * time (seconds)
+	//finished a liter of water output 5880 pulses
 public:
 	WaterFlowSensor(const struct gpio_s& _pinout) {
 		imp_ = new WaterFlowSensorImp(_pinout);

@@ -47,6 +47,7 @@ void decorator_test(void) {
 }
 
 void builder_test(void) {
+	std::cout << "-------------------------------builder test-----------------------------------" << std::endl;
 	const struct gpio_s pump1gpio_in1 = { 0, 0 };
 	const struct gpio_s pump1gpio_in2 = { 0, 1 };
 	const std::array<struct gpio_s, 2> pump1gpio = { pump1gpio_in1, pump1gpio_in2 };
@@ -68,8 +69,11 @@ void builder_test(void) {
 
 	sector_builder->ProducePartA();
 	sector_builder->ProducePartC();
-	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia");
-	sector_builder->producePlantWithDMAMoistureSensor("Kroton");
+	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia1");
+	sector_builder->producePlantWithDMAMoistureSensor("Kroton1");
+	sector_builder->producePlantWithDMAMoistureSensor("Kroton2");
+	sector_builder->producePlantWithDMAMoistureSensor("Truskawka1");
+	sector_builder->producePlantWithDMAMoistureSensor("Truskawka2");
 	sector_builder->produceDRV8833PumpWithController(pump_controller_mode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
 	std::unique_ptr<IrrigationSector>(p_sector2);
 	p_sector2 = sector_builder->GetProduct();
@@ -86,7 +90,7 @@ void builder_test(void) {
 	bool water = false;
 	p_sector2->pump_controller.update(1, water);
 	p_sector2->update();
-	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "-----------------------------setPlantMoistureByName success"  << std::endl;
+	if (p_sector2->setPlantMoistureByName("Pelargonia", 89)) std::cout << "setPlantMoistureByName success"  << std::endl;
 	std::cout << "Pelargonia health: "<< p_sector2->getPlantHealth("Pelargonia") << std::endl;
 	p_sector2->pump_controller.update(0.02, activate_watering1);
 
@@ -108,6 +112,11 @@ void builder_test(void) {
 	p_watertank->ListParts();
 	p_watertank->update(0.02_sec);
 	std::cout << error_code << std::endl;
+
+	IrrigationSectorInfo_s sector2_mail;
+
+	sector2_mail = p_sector2->getInfo();
+	std::cout << "-----------------------------sector2_mail: "<<sector2_mail.plants_aliases << std::endl;
 	//p_watertank->setHeight(78.0_cm);
 	//std::cout << "literals-----------------" << p_watertank->getHeightMeters() << std::endl;
 
@@ -148,10 +157,10 @@ void bridge_test() {
 	sensor1->read();
 	sensor2->read();
 	sensor3->read();
-	if (sensor4->getType() == sensor_type_t::temperature_sensor) std::cout << "------------------temp sensor" << std::endl;
-	if (sensor3->getType() == sensor_type_t::waterflow_sensor) std::cout << "------------------waterflow sensor" << std::endl;
-	if (sensor2->getType() == sensor_type_t::waterlevel_sensor) std::cout << "------------------wl sensor" << std::endl;
-	if (sensor1->getType() == sensor_type_t::generic_sensor) std::cout << "------------------gen sensor" << std::endl;
+	if (sensor4->getType() == sensor_type_t::temperature_sensor) std::cout << "temp sensor" << std::endl;
+	if (sensor3->getType() == sensor_type_t::waterflow_sensor) std::cout << "waterflow sensor" << std::endl;
+	if (sensor2->getType() == sensor_type_t::waterlevel_sensor) std::cout << "wl sensor" << std::endl;
+	if (sensor1->getType() == sensor_type_t::generic_sensor) std::cout << "gen sensor" << std::endl;
 
 	delete sensor1;
 	delete sensor2;
@@ -164,7 +173,7 @@ void bridge_test() {
 	//vSensors.back()->getResult(is_submersed);
 
 	if (is_submersed == false) std::cout << "Submersed false" << std::endl;
-	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "-----------------------------vSensors waterflow sensor" << std::endl;
+	if (vSensors.at(0)->getType() == sensor_type_t::waterflow_sensor) std::cout << "vSensors waterflow sensor" << std::endl;
 
 	Pump *pump0 = new Pump(0);
 	Pump *pump1 = new DRV8833DcPump(1, 10, 30, { 0,1 }, { 5,1 }, { 1,1 }, { 2,1 });
@@ -208,6 +217,19 @@ int main()
 
 	tank_delay.set_hysteresis_time_from(false, 2000.0_msec);
 	tank_delay.set_hysteresis_time_from(true, 2000.0_msec);
+
+	std::vector<std::string> vPlants;
+	vPlants.push_back("Kroton1");
+	vPlants.push_back("Kroton2");
+	std::string plants;
+
+	std::cout << plants << std::endl;
+
+	for (auto &plant: vPlants) plants += plant.substr(0, 3) + plant.substr(plant.length()-1, 1) + ";";
+	std::cout << plants << std::endl;
+
+	Sleep(5000);
+
 
 
 	while (1) {

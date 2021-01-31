@@ -73,7 +73,7 @@ public:
 		init(std::move(_idletime_required_seconds), std::move(_runtime_limit_seconds));
 		std::cout << "PumpImp move constructor " << std::endl;//TODO: delete on STM32
 	}
-	~PumpImp() {
+	virtual ~PumpImp() {
 		std::cout << "PumpImp dtor " << std::endl;//TODO: delete on STM32
 	}
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
@@ -236,7 +236,7 @@ public:
 		std::cout << "Pump move constructor " << std::endl;//TODO: delete on STM32
 		imp_ = new PumpImp(std::move(_id), std::move(_type), std::move(_idletime_required_seconds), std::move(_runtime_limit_seconds));
 	}
-	~Pump() {
+	virtual ~Pump() {
 		std::cout << "Pump dtor " << std::endl;//TODO: delete on STM32
 		delete imp_;
 	}

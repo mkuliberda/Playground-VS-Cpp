@@ -1,11 +1,20 @@
 #include "sector.h"
+#include <algorithm>
 
-void IrrigationSector::encodeErrors() const {
+void IrrigationSector::encodeErrors(){
+	sector_info.errors = 0;
 	//TODO: implement this
 }
 
-void IrrigationSector::encodeState() const {
+void IrrigationSector::encodeState(){
+	sector_info.state = 0;
 	//TODO: implement this
+}
+
+void IrrigationSector::encodePlants() {
+	std::string sector_plants;
+	for (auto &plant : vPlants) sector_plants += std::to_string(plant->getId()) + plant->getName().substr(0, 3) + ";";
+	sector_plants.copy(sector_info.plants_aliases, (PLANTS_FIELD_LEN < sector_plants.length()) ? PLANTS_FIELD_LEN : sector_plants.length());
 }
 
 const uint8_t&  IrrigationSector::getId() {
@@ -41,21 +50,14 @@ const bool& IrrigationSector::getWateringState() {
 	return watering;
 }
 
-void IrrigationSector::update() const {
+void IrrigationSector::update() {
 	encodeState();
 	encodeErrors();
+	encodePlants();
 }
 
 const struct IrrigationSectorInfo_s&	IrrigationSector::getInfo() {
 	update();
-	//TODO: implement this
-	//sector_info.state = 0; //todo
-	//sector_info.errors = 0; //todo
-	//for (auto &plant : vPlants) {
-	//	plants += plant->getName();
-	//	plants += ",";
-	//}
-	//std::strcpy(sector_info.plants, plants.c_str());
 	return sector_info;
 }
 
