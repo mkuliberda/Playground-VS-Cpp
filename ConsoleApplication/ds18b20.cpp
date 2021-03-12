@@ -17,10 +17,10 @@ void DS18B20::delay_us(const uint32_t & _us) {
 	//while (ptimer->Instance->CNT <= _us); TODO: correct on STM32
 }
 
-bool& DS18B20::init(const struct gpio_s & _pinout, TIM_HandleTypeDef* _tim_baseHandle) {
+bool& DS18B20::init(const struct gpio_s & _pinout, void* _tim_baseHandle) {
 
 	this->valid = false;
-	this->ptimer = _tim_baseHandle;
+	this->ptimer = (TIM_HandleTypeDef*)_tim_baseHandle;
 	this->pinout.port = _pinout.port;
 	this->pinout.pin = _pinout.pin;
 	uint8_t retry_count = 0;

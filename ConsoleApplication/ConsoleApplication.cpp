@@ -14,9 +14,25 @@
 #include "watertank.h"
 #include "sensors.h"
 #include "hysteresis.h"
+#include <algorithm>
+#include "cache.h"
+#include "test_classes.h"
+#include "SimpleClass.h"
+#include <mutex>
 
+
+namespace rest {
+	int variable1;
+};
+
+namespace rest2 {
+	int variable1;
+};
 
 void decorator_test(void) {
+
+	rest::variable1 = 3;
+
 	std::string name = "Pelargonia";
 	uint8_t id = 0;
 	PlantInterface *anPlantWithDMAMoistureSensor = new PlantWithDMAMoistureSensor(new Plant(name, 0), 3.3, 4095);
@@ -67,6 +83,11 @@ void builder_test(void) {
 	std::unique_ptr<IrrigationSector>(p_sector1);
 	p_sector1 = sector_builder->GetProduct();
 
+
+	std::unique_ptr<IrrigationSector>(p_sector2);
+	sector_builder->ProducePartC()
+		.ProducePartA()
+		.ProducePartA();
 	sector_builder->ProducePartA();
 	sector_builder->ProducePartC();
 	sector_builder->producePlantWithDMAMoistureSensor("Pelargonia1");
@@ -75,7 +96,6 @@ void builder_test(void) {
 	sector_builder->producePlantWithDMAMoistureSensor("Truskawka1");
 	sector_builder->producePlantWithDMAMoistureSensor("Truskawka2");
 	sector_builder->produceDRV8833PumpWithController(pump_controller_mode_t::external, 60, 300, pump1gpio, pump1led, pump1fault, pump1mode);
-	std::unique_ptr<IrrigationSector>(p_sector2);
 	p_sector2 = sector_builder->GetProduct();
 
 	delete sector_builder;
@@ -209,6 +229,104 @@ void hysteresis_test(const double& _abs_time_ms) {
 }
 
 
+#define LOG_TEXT_LEN 26
+#define LOG_FORMAT "%02d-%02d-%02d %02d:%02d:%02d %s: %s\n"
+
+struct log_msg {
+	char 			text[LOG_TEXT_LEN];
+	uint8_t			len;
+};
+
+#define MINIMUM(a,b)            (((a) < (b)) ? (a) : (b))
+#define MAXIMUM(a,b)            (((a) > (b)) ? (a) : (b))
+uint16_t publishLogMessage(std::string msg_txt, const uint8_t &_maxlen)
+{
+	uint16_t retval = 0x00;
+
+	log_msg *msg = new log_msg;
+
+	std::cout << "lengths: " << msg_txt.length() << " " << std::to_string(_maxlen) << std::endl;
+	std::cout << "msg_txt: " << msg_txt << std::endl;
+	std::cout << "msg->text: " << msg->text << std::endl;
+
+	msg_txt.shrink_to_fit();
+	if (msg_txt.length() >= _maxlen) {
+		msg_txt = msg_txt.substr(msg_txt.length() - _maxlen + 1, _maxlen - 1);
+		std::cout << "substr msg_txt: " << msg_txt << std::endl;
+		retval = 0x0001;
+	}
+	msg->len = msg_txt.length() + 1;
+	msg_txt.copy(msg->text, msg_txt.length(), 0);
+	msg->text[MINIMUM((_maxlen - 1), msg_txt.length())] = '\0';
+
+	std::cout << "lengths: " << msg_txt.length() << " " << std::to_string(msg->len) << std::endl;
+	std::cout << "msg_txt: " << msg_txt << std::endl;
+	std::cout << "msg->text: " << msg->text << std::endl;
+
+	delete msg;
+
+	return retval;
+}
+
+void pointer_reference_test() {
+	int test = 7;
+
+
+	int *p_test = &test;
+	int& r_test = test;
+	int **pp_test = &p_test;
+	int test2 = *p_test;
+
+	std::cout << "pointer_reference_test:" << std::endl;
+	std::cout << "variable val: " << test << " "<< &test<<std::endl;
+	std::cout << "p_test vals: " << p_test <<" "<< *p_test <<std::endl;
+	std::cout << "pp_test vals: " << pp_test << " " << *pp_test << " " << **pp_test << " " << *(*pp_test) << std::endl;
+	std::cout << "r_test vals: " << r_test <<" "<< &r_test << std::endl;
+}
+
+void singleton_test() {
+	Cache* cache1 = Cache::GetInstance("FOO");
+	Cache* cache2 = Cache::GetInstance("BAR");
+	Cache* cache3 = Cache::GetInstance("HAH");
+	std::cout << cache1->getValue() << std::endl;
+	std::cout << cache2->getValue() << std::endl;
+	std::cout << cache3->getValue() << std::endl;
+
+
+}
+
+void _2d_array_memory_allocation_test()
+{
+	std::cout << "started 2d allocation" << std::endl;
+	int rows = 3, columns = 4;
+	int *arr = (int *)malloc(rows * columns * sizeof(int));
+
+	int i, j, count = 0;
+	for (i = 0; i < rows; i++)
+		for (j = 0; j < columns; j++)
+		{
+			*(arr + i * columns + j) = std::rand();
+		}
+
+
+	std::string line;
+	int value = 0;
+	count = 0;
+	for (i = 0; i < rows; i++){
+		for (j = 0; j < columns; j++) {
+			value = *(arr + i * columns + j);
+			line += "|" + std::to_string(value);
+			++count;
+			if (count == rows) {
+				count = 0;
+				std::cout << line <<"|"<< std::endl;
+				line.clear();
+			}
+		}
+	}
+	std::cout << "finished 2d allocation" << std::endl;
+}
+
 int main()
 {
 	std::cout << "Hello World!\n";
@@ -230,12 +348,32 @@ int main()
 
 	Sleep(5000);
 
+	float z = 2.0;
+	IBase *baseobject = new ImpBase();
+	Client clientobject(baseobject);
+
+	Derived obj;
+
+	SimpleClass simpleobj;
+	Plant *plant = new Plant("Kroton", 1);
+
+	simpleobj.createSth(plant);
+
+	delete baseobject;
+	delete plant;
 
 
 	while (1) {
-		decorator_test();
-		builder_test();
-		bridge_test();
+		//decorator_test();
+		//builder_test();
+		//bridge_test();
+		pointer_reference_test();
+		//_2d_array_memory_allocation_test();
+		//singleton_test();
+		
+		//obj.func(z);
+		//clientobject.update(z);
+
 		
 
 		if (dt < 15.0_sec) watering = true;
@@ -244,14 +382,17 @@ int main()
 			dt = 0.0_sec;
 			watering = true;
 		}
-		controller_test(watering, 1);
+
+		//publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
+		//controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		//else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		
 		Sleep(100);
 		dt += 100.0_msec;
-		hysteresis_test(dt);
+		//hysteresis_test(dt);
+
 	}
 	return 0;
 

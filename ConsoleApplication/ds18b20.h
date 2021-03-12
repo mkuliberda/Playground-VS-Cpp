@@ -92,7 +92,7 @@ public:
 		temperature_celsius(-1000)
 	{};
 
-	bool& 							init(const struct gpio_s & _gpio, TIM_HandleTypeDef* _tim_baseHandle);
+	bool& 							init(const struct gpio_s & _gpio, void* _tim_baseHandle);
 	bool& 							isValid(void);
 	float& 							readTemperatureCelsius(const double & _dt);
 
