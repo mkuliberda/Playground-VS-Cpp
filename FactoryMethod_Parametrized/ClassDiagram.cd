@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1">
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="Application">
-    <Position X="5.25" Y="0.5" Width="1.5" />
+    <Position X="9.25" Y="0.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAIAAAAAAICAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Application.h</FileName>
@@ -15,7 +15,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="DocumentFactory">
-    <Position X="7" Y="0.5" Width="1.5" />
+    <Position X="4" Y="0.5" Width="4.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
       <FileName>DocumentFactory.h</FileName>
