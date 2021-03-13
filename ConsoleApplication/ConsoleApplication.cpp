@@ -329,6 +329,7 @@ void _2d_array_memory_allocation_test()
 
 int main()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	std::cout << "Hello World!\n";
 	double dt = 0.0_sec;
 	bool watering = false;
@@ -367,7 +368,7 @@ int main()
 		//decorator_test();
 		//builder_test();
 		//bridge_test();
-		pointer_reference_test();
+		//pointer_reference_test();
 		//_2d_array_memory_allocation_test();
 		//singleton_test();
 		
@@ -383,7 +384,7 @@ int main()
 			watering = true;
 		}
 
-		//publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
+		publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
 		//controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;

@@ -151,7 +151,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="FactoryMethod_ApplicationFramework.cpp" />
+    <ClCompile Include="PdfApplication.cpp" />
+    <ClCompile Include="PdfDocument.cpp" />
+    <ClCompile Include="TextApplication.cpp" />
+    <ClCompile Include="TextDocument.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="Document.h" />
+    <ClInclude Include="PdfApplication.h" />
+    <ClInclude Include="PdfDocument.h" />
+    <ClInclude Include="TextApplication.h" />
+    <ClInclude Include="TextDocument.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

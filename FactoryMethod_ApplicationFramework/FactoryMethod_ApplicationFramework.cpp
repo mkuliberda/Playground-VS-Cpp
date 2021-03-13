@@ -2,10 +2,23 @@
 //
 
 #include <iostream>
+#include "TextApplication.h"
+#include "PdfApplication.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	TextApplication text_app;
+	PdfApplication pdf_app;
+
+    std::cout << "Hello FactoryMethod!\n";
+	text_app.New();
+	text_app.Open();
+	text_app.Save();
+
+	pdf_app.New();
+	pdf_app.Open();
+	pdf_app.Save();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
