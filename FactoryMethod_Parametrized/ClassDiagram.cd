@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Application">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAICAAAIAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Users\Mati\source\repos\ConsoleApplication\FactoryMethod_ApplicationFramework\Application.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Document">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAEAAIA=</HashCode>
+      <FileName>C:\Users\Mati\source\repos\ConsoleApplication\FactoryMethod_ApplicationFramework\Document.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PdfDocument">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>C:\Users\Mati\source\repos\ConsoleApplication\FactoryMethod_ApplicationFramework\PdfDocument.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextDocument">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>C:\Users\Mati\source\repos\ConsoleApplication\FactoryMethod_ApplicationFramework\TextDocument.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DocumentFactory">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentFactory.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

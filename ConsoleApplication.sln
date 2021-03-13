@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Clock", "Clock\Clock.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FactoryMethod_ApplicationFramework", "FactoryMethod_ApplicationFramework\FactoryMethod_ApplicationFramework.vcxproj", "{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FactoryMethod_Parametrized", "FactoryMethod_Parametrized\FactoryMethod_Parametrized.vcxproj", "{AF00DDD9-B279-4294-9615-68A3DA9A53CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -111,6 +113,14 @@ Global
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Release|x64.Build.0 = Release|x64
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Release|x86.ActiveCfg = Release|Win32
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Release|x86.Build.0 = Release|Win32
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Debug|x64.ActiveCfg = Debug|x64
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Debug|x64.Build.0 = Debug|x64
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Debug|x86.ActiveCfg = Debug|Win32
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Debug|x86.Build.0 = Debug|Win32
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Release|x64.ActiveCfg = Release|x64
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Release|x64.Build.0 = Release|x64
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Release|x86.ActiveCfg = Release|Win32
+		{AF00DDD9-B279-4294-9615-68A3DA9A53CC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
