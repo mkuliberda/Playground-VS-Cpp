@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{AF00DDD9-B279-4294-9615-68A3DA9A53CC}</ProjectGuid>
+    <ProjectGuid>{8B360C7D-D969-449C-89C3-61F4BDE501D4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>FactoryMethodParametrized</RootNamespace>
+    <RootNamespace>ObjectPool</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,21 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="DocumentFactory.cpp" />
-    <ClCompile Include="FactoryMethod_Parametrized.cpp" />
-    <ClCompile Include="PdfDocument.cpp" />
-    <ClCompile Include="TextDocument.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="Document.h" />
-    <ClInclude Include="DocumentFactory.h" />
-    <ClInclude Include="PdfDocument.h" />
-    <ClInclude Include="TextDocument.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClCompile Include="ObjectPool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
