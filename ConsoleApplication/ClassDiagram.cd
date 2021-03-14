@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Cache" Collapsed="true">
+    <Position X="47.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAgAAAAACAAAAAAAAAABAAABCAAAHAgAAAAAAA=</HashCode>
+      <FileName>cache.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DS18B20">
+    <Position X="13.75" Y="11.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>gASIAAACAAAAGggJAQIAABAIhABAgAIhAgAAgAAAAAQ=</HashCode>
+      <FileName>ds18b20.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hysteresis" Collapsed="true">
+    <Position X="51.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAIAQAAAAABAAAgAQAAAAIAAAAAEAgAgAACEAAA=</HashCode>
+      <FileName>hysteresis.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlantInterface">
+    <Position X="21" Y="18.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AgACAgAAACAAAQACAAgAAAAAAAAAAAAQACAEAAAAAAA=</HashCode>
+      <FileName>plants.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Plant">
+    <Position X="17" Y="21.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AgASAgAAACAAAQADAgAAAAAAAAAEAAAQBCAkAAAEAgA=</HashCode>
+      <FileName>plants.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlantWithSensor">
+    <Position X="23.25" Y="21.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AgAKAgEAAKAAAQACAAAAAAAAAAAAAAAQACAkAAAAAAA=</HashCode>
+      <FileName>plants.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlantWithDMAMoistureSensor">
+    <Position X="21.5" Y="26.5" Width="7.25" />
+    <TypeIdentifier>
+      <HashCode>AgBSAgAABGUAAQACAAAAAAAAAAQAAAAAACAkABAAAAA=</HashCode>
+      <FileName>plants.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PumpImp">
+    <Position X="33.25" Y="11.25" Width="9.25" />
+    <TypeIdentifier>
+      <HashCode>QAQAAgCAAAAECABgAAAEAQAAAQAnRAIEEEAgECAAAAY=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DRV8833DcPumpImp">
+    <Position X="29.25" Y="18.5" Width="17.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgEQAIAAAQCgAACAAAAAAAAgAJIAAAAggGAACAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pump">
+    <Position X="5.5" Y="29.25" Width="8.75" />
+    <TypeIdentifier>
+      <HashCode>YAgAAgAAAAAECABgAAAAAAAAAQAmhAIAEAAgACAAAAY=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DRV8833DcPump">
+    <Position X="1.25" Y="35.5" Width="17.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAQAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PumpController" Collapsed="true">
+    <Position X="49.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BABAAAEAAAAAAiCABAICAQAAAAAAABAAAAAAAAAEIAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IrrigationSector" Collapsed="true">
+    <Position X="47.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AjIAEAAAAAEAEAAAAEAAAAEARAAUECBAEEEhAAAFAAA=</HashCode>
+      <FileName>sector.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IrrigationSectorBuilder">
+    <Position X="20.5" Y="3.25" Width="19.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAIAAAAAAAAQBABAAAAAAAA=</HashCode>
+      <FileName>sector.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ConcreteIrrigationSectorBuilder">
+    <Position X="20.25" Y="6.5" Width="19.75" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAABAAABAAAAAAAAAIAAAEAAAAQBABgCAAAAAA=</HashCode>
+      <FileName>sector.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SensorImp">
+    <Position X="10.25" Y="10.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAABCEAAACEIAAAAAQAAAAAAAAAgAAAAAAQ=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpticalWaterLevelSensorImp">
+    <Position X="5" Y="14.25" Width="7.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACBAAAAAACIAAAAAIAAAAAIEAAAgAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WaterFlowSensorImp">
+    <Position X="21" Y="14.25" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACIAAAAAACAAAAAAABAgAAABAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DS18B20TemperatureSensorImp">
+    <Position X="8.25" Y="18.25" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAQAAAAAAAAAACAAAAAAACAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sensor">
+    <Position X="7.25" Y="3.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAQABCAAAACAAAAAAAQAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpticalWaterLevelSensor">
+    <Position X="6.75" Y="7.25" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoIAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WaterFlowSensor">
+    <Position X="13.25" Y="7.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DS18B20TemperatureSensor">
+    <Position X="1" Y="7.25" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleClass" Collapsed="true">
+    <Position X="51.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAEAA=</HashCode>
+      <FileName>SimpleClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Base">
+    <Position X="0.5" Y="14.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>test_classes.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Derived">
+    <Position X="0.5" Y="16" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>test_classes.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IBase">
+    <Position X="0.5" Y="10.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>test_classes.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ImpBase">
+    <Position X="0.5" Y="12" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>test_classes.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Client" Collapsed="true">
+    <Position X="49.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAEAAQ=</HashCode>
+      <FileName>test_classes.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Watertank" Collapsed="true">
+    <Position X="47.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>A4IAYAAAAAAE0AAKIAMCAiAAAABAAAwGSIA0gAAEAlg=</HashCode>
+      <FileName>watertank.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WatertankBuilder">
+    <Position X="0.75" Y="21.25" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAABAAAAAQQAgAABAAAAAA=</HashCode>
+      <FileName>watertank.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ConcreteWatertankBuilder">
+    <Position X="0.75" Y="24.5" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAABAAIAAABgAAAAAACAAQQAgAgDAAAAAA=</HashCode>
+      <FileName>watertank.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="log_msg" Collapsed="true">
+    <Position X="51.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleApplication.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="gpio_s" Collapsed="true">
+    <Position X="47.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>main.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_0067_1">
+    <Position X="13.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAgAgAAAAAAAAAAAAAAAAAAAAAAQAACBAAAAAA=</HashCode>
+      <FileName>main.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PumpInfo_s" Collapsed="true">
+    <Position X="47.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAIAAAAAAAEAAAAAAAAAgA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="IrrigationSectorInfo_s" Collapsed="true">
+    <Position X="49.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAEAAAAAAAAAAAAEAAAAAAAAAgA=</HashCode>
+      <FileName>sector.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="WatertankInfo_s" Collapsed="true">
+    <Position X="49.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAgA=</HashCode>
+      <FileName>watertank.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="uint32_t" Collapsed="true">
+    <Position X="51.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\stdint.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint8_t" Collapsed="true">
+    <Position X="47.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\stdint.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="uint16_t" Collapsed="true">
+    <Position X="49.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\stdint.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="int8" Collapsed="true">
+    <Position X="47.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="TIM_HandleTypeDef" Collapsed="true">
+    <Position X="13" Y="4.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>main.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="plant_type_t" Collapsed="true">
+    <Position X="51.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAACAAAAA=</HashCode>
+      <FileName>plants.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="pump_state_t" Collapsed="true">
+    <Position X="51.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAECAAAAAAAAAAgAAAIAAAAAAAAAAEI=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="pump_type_t" Collapsed="true">
+    <Position X="47.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAABAAAAAAAAEAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="motortype_t" Collapsed="true">
+    <Position X="49.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="pump_cmd_t" Collapsed="true">
+    <Position X="47.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAgAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="pump_controller_mode_t" Collapsed="true">
+    <Position X="49.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEEAAAAAAAgAAAAAAAIAAAAIAAAAAAA=</HashCode>
+      <FileName>pumps.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="fixedwaterlevelsensorstate_t" Collapsed="true">
+    <Position X="47.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAEAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="sensor_type_t" Collapsed="true">
+    <Position X="49.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAgAAAAAAAAAgAAAAAAAAAAIQAAAAA=</HashCode>
+      <FileName>sensors.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

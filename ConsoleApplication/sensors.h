@@ -27,9 +27,9 @@ public:
 	virtual ~SensorImp() {
 		std::cout << "SensorImp dtor " << std::endl;//TODO: delete on STM32
 	}
-	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	SensorImp(SensorImp const &) = delete;
-	SensorImp& operator=(SensorImp const&) = delete;
+	 
+	SensorImp(SensorImp const &) = delete; //To avoid runtime errors, delete copy constructor. If sth's wrong, compile time error will fire.
+	SensorImp& operator=(SensorImp const&) = delete; //To avoid runtime errors, copy assignment operator. If sth's wrong, compile time error will fire.
 
 	virtual float						read(const double& _dt=0);
 	virtual sensor_type_t				getType() const;
@@ -136,9 +136,9 @@ public:
 		std::cout << "Sensor dtor " << std::endl;//TODO: delete on STM32
 		delete imp_;
 	}
-	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	Sensor(Sensor const &) = delete;
-	Sensor& operator=(Sensor const&) = delete;
+	
+	Sensor(Sensor const &) = delete; //To avoid runtime errors, delete copy constructor. If sth's wrong, compile time error will fire.
+	Sensor& operator=(Sensor const&) = delete; //To avoid runtime errors, delete assignment operator. If sth's wrong, compile time error will fire.
 
 	virtual float							read(const double& _dt = 0);
 	virtual sensor_type_t					getType();
@@ -176,9 +176,9 @@ public:
 	~WaterFlowSensor() {
 		std::cout << "WaterFlowSensor dtor " << std::endl;//TODO: delete on STM32
 	}
-	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
-	WaterFlowSensor(WaterFlowSensor const &) = delete;
-	WaterFlowSensor& operator=(WaterFlowSensor const&) = delete;
+	
+	WaterFlowSensor(WaterFlowSensor const &) = delete; //To avoid runtime errors, delete copy constructor. If sth's wrong, compile time error will fire.
+	WaterFlowSensor& operator=(WaterFlowSensor const&) = delete; //To avoid runtime errors, copy assignment operator. If sth's wrong, compile time error will fire.
 };
 
 class DS18B20TemperatureSensor : public Sensor {
