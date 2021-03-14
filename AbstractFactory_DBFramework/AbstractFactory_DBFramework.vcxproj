@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AbstractFactory_DBFramework.cpp" />
+    <ClCompile Include="DbFactory.cpp" />
     <ClCompile Include="MySqlCommand.cpp" />
     <ClCompile Include="MySqlConnection.cpp" />
     <ClCompile Include="MySqlRecordSet.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="Command.h" />
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="DbFactory.h" />
     <ClInclude Include="MySqlCommand.h" />
     <ClInclude Include="MySqlConnection.h" />
     <ClInclude Include="MySqlRecordSet.h" />

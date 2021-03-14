@@ -1,24 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="Command">
-    <Position X="6.75" Y="5.5" Width="3.25" />
+    <Position X="12.5" Y="0.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AIAAAAIAAAAAAAAAAAAAAEQAAAAYAAAAAAABABAIAAA=</HashCode>
       <FileName>Command.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Connection">
-    <Position X="0.75" Y="5.5" Width="3.5" />
+    <Position X="6.5" Y="0.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAKAAAAgAAAAAAAAAIAAAAAAAAAA=</HashCode>
       <FileName>Connection.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="SqlCommand">
-    <Position X="5.5" Y="9.25" Width="2.5" />
+  <Class Name="MySqlCommand">
+    <Position X="11.25" Y="4.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>SqlCommand.h</FileName>
+      <FileName>MySqlCommand.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MySqlConnection">
+    <Position X="6.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MySqlConnection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MySqlRecordSet">
+    <Position X="0.5" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAEAAAAAQABAAAAAAAAAQAAA=</HashCode>
+      <FileName>MySqlRecordSet.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="RecordSet">
@@ -28,39 +42,32 @@
       <FileName>RecordSet.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="SqlRecordSet">
-    <Position X="0.5" Y="2.75" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAAABAAAAAAAAAAAAQABAAAAAAAAAQAAA=</HashCode>
-      <FileName>SqlRecordSet.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MySqlRecordSet">
-    <Position X="3.5" Y="2.75" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAABAAAAAAEAAAAAQABAAAAAAAAAQAAA=</HashCode>
-      <FileName>MySqlRecordSet.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MySqlCommand">
-    <Position X="8.75" Y="9.25" Width="2.5" />
+  <Class Name="SqlCommand">
+    <Position X="14.5" Y="4.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>MySqlCommand.h</FileName>
+      <FileName>SqlCommand.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SqlConnection">
-    <Position X="0.5" Y="8.5" Width="1.5" />
+    <Position X="8.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SqlConnection.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MySqlConnection">
-    <Position X="2.75" Y="8.5" Width="1.5" />
+  <Class Name="SqlRecordSet">
+    <Position X="3.5" Y="2.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>MySqlConnection.h</FileName>
+      <HashCode>AAQAAAAAAAAAAABAAAAAAAAAAAAQABAAAAAAAAAQAAA=</HashCode>
+      <FileName>SqlRecordSet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DBFactory">
+    <Position X="1.25" Y="5.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DbFactory.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

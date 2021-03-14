@@ -2,5 +2,5 @@
 
 void SqlConnection::Open()
 {
-	std::cout << "__FUNCISG__ Connection opened" <<std::endl;
+	std::cout << __FUNCSIG__<<" Connection opened" <<std::endl;
 }

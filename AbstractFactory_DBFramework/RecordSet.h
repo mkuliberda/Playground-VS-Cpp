@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+//Just a helper class simulate database response
+
 class RecordSet
 {
 public:

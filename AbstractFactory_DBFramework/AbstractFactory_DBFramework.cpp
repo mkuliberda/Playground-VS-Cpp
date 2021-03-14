@@ -2,11 +2,42 @@
 //
 
 #include <iostream>
+#include "DbFactory.h"
+#include "RecordSet.h"
+#include "Connection.h"
+#include "MySqlConnection.h"
+#include "SqlConnection.h"
+#include "MySqlCommand.h"
+#include "SqlCommand.h"
+#include <string_view>
+
 
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    std::cout << "Hello Abstract Factory example!\n";
+
+	std::cout << "Hello Abstract Factory example!\n";
+	std::string_view db_type{ "sql" };
+
+	Connection *pCon = DBFactory::CreateConnection(db_type) ;
+	pCon->SetConnectionString("Just some connection string");
+	pCon->Open();
+
+	Command *pCmd = DBFactory::CreateCommand(db_type);
+	pCmd->SetConnection(pCon);
+	pCmd->SetCommand("Just some sample command");
+	pCmd->ExecuteCommand();
+
+	RecordSet *pRecSet = pCmd->ExecuteQuery();
+	while (pRecSet->HasNext()) {
+		std::cout << pRecSet->Get() << std::endl;
+	}
+
+
+
+	delete pCon;
+	delete pCmd;
+	delete pRecSet;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

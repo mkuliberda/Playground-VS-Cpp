@@ -5,14 +5,14 @@
 
 void MySqlCommand::ExecuteCommand()
 {
-	std::cout
-		<< "__FUNCSIG__: Executing command on"
+	std::cout<<__FUNCSIG__
+		<< " Executing command on: "
 		<< m_pConnection->GetConnectionString()
 		<< std::endl;
 }
 
 MySqlRecordSet * MySqlCommand::ExecuteQuery()
 {
-	std::cout << "__FUNCSIG__" << std::endl;
+	std::cout << __FUNCSIG__ << std::endl;
 	return new MySqlRecordSet();
 }

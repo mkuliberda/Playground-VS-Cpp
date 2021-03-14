@@ -3,5 +3,5 @@
 
 void MySqlConnection::Open()
 {
-	std::cout << "__FUNCSIG__ Connection opened" <<std::endl;
+	std::cout << __FUNCSIG__ <<" Connection opened" <<std::endl;
 }
