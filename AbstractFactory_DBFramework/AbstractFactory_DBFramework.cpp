@@ -1,11 +1,12 @@
-// Logger.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// AbstractFactory_DBFramework.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    std::cout << "Hello Abstract Factory example!\n";
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

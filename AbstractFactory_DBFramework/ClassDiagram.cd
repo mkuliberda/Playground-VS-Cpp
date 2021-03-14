@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Command">
+    <Position X="6.75" Y="5.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAIAAAAAAAAAAAAAAEQAAAAYAAAAAAABABAIAAA=</HashCode>
+      <FileName>Command.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Connection">
+    <Position X="0.75" Y="5.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAKAAAAgAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Connection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SqlCommand">
+    <Position X="5.5" Y="9.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SqlCommand.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RecordSet">
+    <Position X="2.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAgAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RecordSet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SqlRecordSet">
+    <Position X="0.5" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAABAAAAAAAAAAAAQABAAAAAAAAAQAAA=</HashCode>
+      <FileName>SqlRecordSet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MySqlRecordSet">
+    <Position X="3.5" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAEAAAAAQABAAAAAAAAAQAAA=</HashCode>
+      <FileName>MySqlRecordSet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MySqlCommand">
+    <Position X="8.75" Y="9.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MySqlCommand.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SqlConnection">
+    <Position X="0.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SqlConnection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MySqlConnection">
+    <Position X="2.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MySqlConnection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

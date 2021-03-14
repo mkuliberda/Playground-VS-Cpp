@@ -15,15 +15,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeyersSingleton", "MeyersSi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Monostate", "Monostate\Monostate.vcxproj", "{8E5A0DD1-6486-4DA4-9BC7-21482435269D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logger", "Logger\Logger.vcxproj", "{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Clock", "Clock\Clock.vcxproj", "{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FactoryMethod_ApplicationFramework", "FactoryMethod_ApplicationFramework\FactoryMethod_ApplicationFramework.vcxproj", "{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FactoryMethod_Parametrized", "FactoryMethod_Parametrized\FactoryMethod_Parametrized.vcxproj", "{AF00DDD9-B279-4294-9615-68A3DA9A53CC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ObjectPool", "ObjectPool\ObjectPool.vcxproj", "{8B360C7D-D969-449C-89C3-61F4BDE501D4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AbstractFactory_DBFramework", "AbstractFactory_DBFramework\AbstractFactory_DBFramework.vcxproj", "{E53A7727-635B-4B58-9DEE-B54B843555B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,22 +79,6 @@ Global
 		{8E5A0DD1-6486-4DA4-9BC7-21482435269D}.Release|x64.Build.0 = Release|x64
 		{8E5A0DD1-6486-4DA4-9BC7-21482435269D}.Release|x86.ActiveCfg = Release|Win32
 		{8E5A0DD1-6486-4DA4-9BC7-21482435269D}.Release|x86.Build.0 = Release|Win32
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Debug|x64.ActiveCfg = Debug|x64
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Debug|x64.Build.0 = Debug|x64
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Debug|x86.ActiveCfg = Debug|Win32
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Debug|x86.Build.0 = Debug|Win32
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Release|x64.ActiveCfg = Release|x64
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Release|x64.Build.0 = Release|x64
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Release|x86.ActiveCfg = Release|Win32
-		{EA37A182-86A6-4CC7-ADDE-9AF2FC06CF66}.Release|x86.Build.0 = Release|Win32
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Debug|x64.ActiveCfg = Debug|x64
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Debug|x64.Build.0 = Debug|x64
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Debug|x86.ActiveCfg = Debug|Win32
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Debug|x86.Build.0 = Debug|Win32
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Release|x64.ActiveCfg = Release|x64
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Release|x64.Build.0 = Release|x64
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Release|x86.ActiveCfg = Release|Win32
-		{B7BE690B-D258-49C0-A77F-9CAEEBE9A6C0}.Release|x86.Build.0 = Release|Win32
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Debug|x64.ActiveCfg = Debug|x64
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Debug|x64.Build.0 = Debug|x64
 		{FE6BCCA6-FC21-4C97-B39F-F9D51AB6E819}.Debug|x86.ActiveCfg = Debug|Win32
@@ -121,6 +103,14 @@ Global
 		{8B360C7D-D969-449C-89C3-61F4BDE501D4}.Release|x64.Build.0 = Release|x64
 		{8B360C7D-D969-449C-89C3-61F4BDE501D4}.Release|x86.ActiveCfg = Release|Win32
 		{8B360C7D-D969-449C-89C3-61F4BDE501D4}.Release|x86.Build.0 = Release|Win32
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Debug|x64.ActiveCfg = Debug|x64
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Debug|x64.Build.0 = Debug|x64
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Debug|x86.ActiveCfg = Debug|Win32
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Debug|x86.Build.0 = Debug|Win32
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Release|x64.ActiveCfg = Release|x64
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Release|x64.Build.0 = Release|x64
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Release|x86.ActiveCfg = Release|Win32
+		{E53A7727-635B-4B58-9DEE-B54B843555B0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
