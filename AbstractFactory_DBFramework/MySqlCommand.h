@@ -5,6 +5,7 @@
 class MySqlCommand :
 	public Command
 {
+public:
 	void ExecuteCommand();
 	MySqlRecordSet * ExecuteQuery();
 };

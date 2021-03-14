@@ -3,6 +3,7 @@
 class MySqlConnection :
 	public Connection
 {
+public:
 	void Open();
 };
 

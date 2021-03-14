@@ -5,6 +5,7 @@
 class SqlCommand :
 	public Command
 {
+public:
 	void ExecuteCommand();
 	SqlRecordSet * ExecuteQuery();
 };
