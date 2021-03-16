@@ -19,6 +19,7 @@
 #include "test_classes.h"
 #include "SimpleClass.h"
 #include <mutex>
+#include <iterator>
 
 
 namespace rest {
@@ -270,6 +271,8 @@ uint16_t publishLogMessage(std::string msg_txt, const uint8_t &_maxlen)
 
 void pointer_reference_test() {
 	int test = 7;
+	int arr_test[5] = { 0,1,2,3,4 };
+	
 
 
 	int *p_test = &test;
@@ -282,6 +285,16 @@ void pointer_reference_test() {
 	std::cout << "p_test vals: " << p_test <<" "<< *p_test <<std::endl;
 	std::cout << "pp_test vals: " << pp_test << " " << *pp_test << " " << **pp_test << " " << *(*pp_test) << std::endl;
 	std::cout << "r_test vals: " << r_test <<" "<< &r_test << std::endl;
+
+	for (int *i=std::begin(arr_test); i!=std::end(arr_test); i++ )
+	{
+		//*(arr_test++);
+		std::cout << *i <<" "<< i<<" "<<sizeof(i)<< sizeof(*i)<<std::endl;
+	}
+
+	for (auto &i : arr_test) {
+		std::cout << i << std::endl;
+	}
 }
 
 void singleton_test() {
@@ -368,7 +381,7 @@ int main()
 		//decorator_test();
 		//builder_test();
 		//bridge_test();
-		//pointer_reference_test();
+		pointer_reference_test();
 		//_2d_array_memory_allocation_test();
 		//singleton_test();
 		
@@ -384,7 +397,7 @@ int main()
 			watering = true;
 		}
 
-		publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
+		//publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
 		//controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
