@@ -20,6 +20,7 @@
 #include "SimpleClass.h"
 #include <mutex>
 #include <iterator>
+#include <string_view>
 
 
 namespace rest {
@@ -240,31 +241,32 @@ struct log_msg {
 
 #define MINIMUM(a,b)            (((a) < (b)) ? (a) : (b))
 #define MAXIMUM(a,b)            (((a) > (b)) ? (a) : (b))
-uint16_t publishLogMessage(std::string msg_txt, const uint8_t &_maxlen)
+uint16_t publishLogMessage(std::string_view msg_txt, const uint8_t &_maxlen)
 {
+	std::string test_str{ msg_txt };
 	uint16_t retval = 0x00;
 
-	log_msg *msg = new log_msg;
+	log_msg msg = {"", _maxlen };
 
 	std::cout << "lengths: " << msg_txt.length() << " " << std::to_string(_maxlen) << std::endl;
 	std::cout << "msg_txt: " << msg_txt << std::endl;
-	std::cout << "msg->text: " << msg->text << std::endl;
+	std::cout << "msg->text: " << msg.text << std::endl;
 
-	msg_txt.shrink_to_fit();
+	std::cout <<"string_view vs string: "<< sizeof(msg_txt) << " "<<sizeof(test_str) << std::endl;
+	//msg_txt.shrink_to_fit();
 	if (msg_txt.length() >= _maxlen) {
 		msg_txt = msg_txt.substr(msg_txt.length() - _maxlen + 1, _maxlen - 1);
 		std::cout << "substr msg_txt: " << msg_txt << std::endl;
 		retval = 0x0001;
 	}
-	msg->len = msg_txt.length() + 1;
-	msg_txt.copy(msg->text, msg_txt.length(), 0);
-	msg->text[MINIMUM((_maxlen - 1), msg_txt.length())] = '\0';
+	msg.len = msg_txt.length() + 1;
+	msg_txt.copy(msg.text, msg_txt.length(), 0);
+	msg.text[MINIMUM((_maxlen - 1), msg_txt.length())] = '\0';
 
-	std::cout << "lengths: " << msg_txt.length() << " " << std::to_string(msg->len) << std::endl;
+	std::cout << "lengths: " << msg_txt.length() << " " << std::to_string(msg.len) << std::endl;
 	std::cout << "msg_txt: " << msg_txt << std::endl;
-	std::cout << "msg->text: " << msg->text << std::endl;
+	std::cout << "msg->text: " << msg.text << std::endl;
 
-	delete msg;
 
 	return retval;
 }
@@ -381,7 +383,7 @@ int main()
 		//decorator_test();
 		//builder_test();
 		//bridge_test();
-		pointer_reference_test();
+		//pointer_reference_test();
 		//_2d_array_memory_allocation_test();
 		//singleton_test();
 		
@@ -397,7 +399,7 @@ int main()
 			watering = true;
 		}
 
-		//publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
+		publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
 		//controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
