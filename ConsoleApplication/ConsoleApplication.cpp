@@ -63,6 +63,9 @@ void decorator_test(void) {
 	std::cout << std::endl;
 
 }
+#define SECTORS_AMOUNT 4
+#define PUMP_IDLETIME_REQUIRED_SEC 30
+#define PUMP_RUNTIME_LIMIT_SEC 300
 
 void builder_test(void) {
 	std::cout << "-------------------------------builder test-----------------------------------" << std::endl;
@@ -142,6 +145,34 @@ void builder_test(void) {
 	//p_watertank->setHeight(78.0_cm);
 	//std::cout << "literals-----------------" << p_watertank->getHeightMeters() << std::endl;
 
+
+	std::cout << "-----------------------------sectors_builder start: " << std::endl;
+
+	std::array<std::array<struct gpio_s, 2>, SECTORS_AMOUNT> pump_ctrl_gpio;
+	pump_ctrl_gpio[0] = { {{ 0, 0 }, { 0, 0 }} };
+	pump_ctrl_gpio[1] = { {{ 0, 0 }, { 0, 0 }} };
+	pump_ctrl_gpio[2] = { {{ 0, 0 }, { 0, 0 }} };
+	pump_ctrl_gpio[3] = { {{ 0, 0 }, { 0, 0 }} };
+	const struct gpio_s pump_led_gpio[SECTORS_AMOUNT] = { {0, 0},{0, 0},{0, 0},{0, 0} };
+	const struct gpio_s pump_fault_gpio[SECTORS_AMOUNT] = { {0, 0},{0, 0},{0,0},{0, 0} };
+	const struct gpio_s pump_mode_gpio[SECTORS_AMOUNT] = { {0,0},{0, 0},{0, 0}, {0,0} };
+	const struct gpio_s opt_wl_sensor1_gpio = { 1, 1 };
+	std::unique_ptr<IrrigationSector>(p_sector[SECTORS_AMOUNT]);
+
+
+	ConcreteIrrigationSectorBuilder* sectors_builder = new ConcreteIrrigationSectorBuilder[SECTORS_AMOUNT]; //leave as pointer to delete when not needed anymore
+	for (uint8_t i = 0; i < SECTORS_AMOUNT; ++i) {
+		sectors_builder[i].produceDRV8833PumpWithController(pump_controller_mode_t::external, PUMP_IDLETIME_REQUIRED_SEC, PUMP_RUNTIME_LIMIT_SEC, pump_ctrl_gpio[i], pump_led_gpio[i], pump_fault_gpio[i], pump_mode_gpio[i]);
+		sectors_builder[i].ProducePartA();
+	}
+
+	for (uint8_t i = 0; i < SECTORS_AMOUNT; ++i) {
+		p_sector[i] = sectors_builder[i].GetProduct();
+		p_sector[i]->ListParts();
+	}
+
+	delete[] sectors_builder;
+	std::cout << "-----------------------------sectors_builder finished" << std::endl;
 }
 
 
@@ -342,6 +373,13 @@ void _2d_array_memory_allocation_test()
 	std::cout << "finished 2d allocation" << std::endl;
 }
 
+template<typename T, int size> 
+void print_array(T(&ref)[size]) {
+	for (int i = 0; i < size; ++i) {
+		std::cout << ref[i] << " " << std::endl;
+	}
+}
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -378,6 +416,10 @@ int main()
 	delete baseobject;
 	delete plant;
 
+	int arr[] = { 0, 9, 8, 7, 6, 0 };
+
+	print_array(arr);
+
 
 	while (1) {
 		//decorator_test();
@@ -399,13 +441,13 @@ int main()
 			watering = true;
 		}
 
-		publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
+		//publishLogMessage("Irrigation Ctrl task started", LOG_TEXT_LEN);
 		//controller_test(watering, 1);
 
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		//else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		
-		Sleep(100);
+		Sleep(1000);
 		dt += 100.0_msec;
 		//hysteresis_test(dt);
 
