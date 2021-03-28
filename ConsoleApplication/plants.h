@@ -54,8 +54,10 @@ public:
 
 	~Plant()
 	{
-		std::cout << "Plant dtor		";
+		std::cout << "Plant dtor		"<<std::endl;
 	}
+
+
 
 	//To avoid runtime errors, delete copy constructor and copy assignment operator. If sth's wrong, compile time error will fire.
 	Plant(Plant const &) = delete;				

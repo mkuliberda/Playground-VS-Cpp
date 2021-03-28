@@ -21,6 +21,10 @@
 #include <mutex>
 #include <iterator>
 #include <string_view>
+#include <cassert>
+#include <stdexcept>
+#include <queue>
+#include <map>
 
 
 namespace rest {
@@ -264,10 +268,21 @@ void hysteresis_test(const double& _abs_time_ms) {
 
 #define LOG_TEXT_LEN 26
 #define LOG_FORMAT "%02d-%02d-%02d %02d:%02d:%02d %s: %s\n"
+#define LOG_FORMAT_LEN (sizeof(LOG_FORMAT))
+
+
+enum msg_priority_t : uint8_t {
+	INFO,
+	LOW,
+	MEDIUM,
+	HIGH,
+	CRITICAL
+};
 
 struct log_msg {
-	char 			text[LOG_TEXT_LEN];
-	uint8_t			len;
+	char 			text[LOG_TEXT_LEN]{};
+	uint8_t			len{};
+	msg_priority_t	priority{};
 };
 
 #define MINIMUM(a,b)            (((a) < (b)) ? (a) : (b))
@@ -379,6 +394,117 @@ void print_array(T(&ref)[size]) {
 		std::cout << ref[i] << " " << std::endl;
 	}
 }
+template<typename T, int rows, int cols>
+void print_2darray(T(&ref)[rows][cols]) {
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			std::cout << ref[i][j] << " ";
+		}
+	}
+	std::cout<<std::endl;
+}
+
+void heapbased_2darray(const int _rows, int _cols) {
+	const int rows = _rows;
+	const int cols = _cols;
+	assert(rows > 0);
+	assert(cols > 0);
+	if (rows <= 0 || cols <= 0) {
+		throw std::runtime_error("Bad input");
+	}
+
+	int *array_values = new int[rows*cols];
+
+	for (int i = 0; i < (rows*cols); i++) {
+		array_values[i] = rand();
+		std::cout << array_values[i] << std::endl;
+	}
+
+
+	int **pp_arr = new int *[rows];
+	for (int i = 0; i < rows; ++i) {
+		pp_arr[i] = new int[cols];
+	}
+
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			pp_arr[i][j] = array_values[i*cols + j%cols];
+		}
+	}
+	/* 0+0-> 0*3+0%3 -> 0
+		0+1->1 0*3+1%3->1
+		0+2->2 0*3+2%3 ->2
+		1+0->3 1*3+0%3 ->3
+		1+1->4 1*3+1%3 ->4
+		1+2->5 1*3+2%3 ->5
+		*/
+	delete[] array_values;
+
+	std::cout << "resulting array is: " << std::endl;
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			std::cout << pp_arr[i][j]<<" ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void placement_new() {
+	const uint8_t tank_cnt = 5;
+	Watertank *ptr_tank = static_cast<Watertank*>(operator new(sizeof(Watertank) * tank_cnt));
+	for (uint8_t i = 0; i < tank_cnt; ++i) {
+		new (ptr_tank + i)Watertank{i};
+	}
+	std::cout << sizeof(ptr_tank) <<"B "<< sizeof(*ptr_tank) <<"B "<<sizeof(*ptr_tank)/1024.0<<"kB"<< std::endl;
+
+	for (uint8_t i = 0; i < tank_cnt; ++i) {
+		ptr_tank[i].~Watertank(); //operator new requires to call destructors manually
+	}
+
+	operator delete(ptr_tank);
+
+
+}
+
+
+
+typedef std::pair<msg_priority_t, log_msg*> PAIR;
+struct cmp {
+	bool operator()(const PAIR &a, const PAIR &b) {
+		return a.first < b.first;
+	};
+};
+
+void priority_queue() {
+	log_msg *msg1 = new log_msg{ "1Irrigation Ctrl task sta", 0, msg_priority_t::LOW };
+	log_msg *msg2 = new log_msg{ "2Irrigation Ctrl task sta", 0, msg_priority_t::HIGH };
+	log_msg *msg3 = new log_msg{ "3Irrigation Ctrl task sta", 0, msg_priority_t::LOW };
+	std::multimap<msg_priority_t, log_msg*> msg_map = {};// {msg1->priority, msg1}, { msg2->priority, msg2 }, { msg3->priority, msg3 }};
+	msg_map.insert({ msg1->priority, msg1 });
+	msg_map.insert({ msg2->priority, msg2 });
+	msg_map.insert({ msg3->priority, msg3 });
+	log_msg *msg4 = new log_msg{ "4Irrigation Ctrl task sta", 0, msg_priority_t::CRITICAL };
+	msg_map.insert({ msg4->priority, msg4 });
+	std::priority_queue<PAIR, std::vector<PAIR>, cmp> logs_queue;
+	for (const auto &msg: msg_map ) {
+		logs_queue.push(msg);
+	}
+
+	std::cout << logs_queue.size() << std::endl;
+	std::cout << LOG_FORMAT_LEN << std::endl;
+
+	while (!logs_queue.empty()) {
+		PAIR top = logs_queue.top() ;
+		std::cout << top.second->text << " " << std::endl;
+		logs_queue.pop();
+
+	}
+
+	delete msg1;
+	delete msg2;
+	delete msg3;
+	delete msg4;
+}
 
 int main()
 {
@@ -400,7 +526,7 @@ int main()
 	for (auto &plant: vPlants) plants += plant.substr(0, 3) + plant.substr(plant.length()-1, 1) + ";";
 	std::cout << plants << std::endl;
 
-	Sleep(5000);
+	//Sleep(5000);
 
 	float z = 2.0;
 	IBase *baseobject = new ImpBase();
@@ -417,8 +543,31 @@ int main()
 	delete plant;
 
 	int arr[] = { 0, 9, 8, 7, 6, 0 };
+	int arr_2[2][3]{ 1,2,3,4,5,6 };
+	//int (*p_arr_2)[3] = arr_2;
 
-	print_array(arr);
+	//print_array(arr);
+	//print_2darray(arr_2);
+
+	int arr1[5] = { 1,2,3,4,5 };
+	std::array<int, 5> arr2{ 1,2,3,4,5 };
+
+	//std::cout << "Arrays sizes are: " << sizeof(arr1) <<" "<< sizeof(arr2) << std::endl;
+
+	int *ptr = new int{5};
+	delete ptr;
+
+	int sth = 1;
+	ptr = &sth;
+
+	void *ptr1;
+	ptr1 = new int{ 4 };
+	delete ptr1;
+
+	const int rows = 2;
+	const int cols = 3;
+	//std::cout << *ptr << std::endl;
+	//heapbased_2darray(rows,cols);
 
 
 	while (1) {
@@ -431,6 +580,8 @@ int main()
 		
 		//obj.func(z);
 		//clientobject.update(z);
+		//placement_new();
+		priority_queue();
 
 		
 
@@ -447,7 +598,7 @@ int main()
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		//else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		
-		Sleep(1000);
+		Sleep(100);
 		dt += 100.0_msec;
 		//hysteresis_test(dt);
 
