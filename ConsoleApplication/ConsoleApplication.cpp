@@ -506,6 +506,11 @@ void priority_queue() {
 	delete msg4;
 }
 
+void func_pointer_test() {
+	auto (*pubLogMsgPtr)(std::string_view msg_txt, const uint8_t &_maxlen) = publishLogMessage;
+	std::cout << pubLogMsgPtr("Example text", 26) << std::endl;
+}
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -569,8 +574,12 @@ int main()
 	//std::cout << *ptr << std::endl;
 	//heapbased_2darray(rows,cols);
 
+	func_pointer_test();
 
 	while (1) {
+		const char *request = new char[43]{ "GET:Time                                  " };
+		std::cout << request << std::endl;
+		delete request;
 		//decorator_test();
 		//builder_test();
 		//bridge_test();
@@ -581,7 +590,7 @@ int main()
 		//obj.func(z);
 		//clientobject.update(z);
 		//placement_new();
-		priority_queue();
+		//priority_queue();
 
 		
 
