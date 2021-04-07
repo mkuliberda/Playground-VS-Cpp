@@ -3,13 +3,13 @@ template<class T>
 class BubbleSort
 {
 public:
-	void sortArray(T *arr, size_t size);
+	static void sortArray(T *arr, size_t size);
 private:
-	void swap(T *first, T *second);
+	static void swap(T *first, T *second);
 };
 
 template<class T>
-inline void BubbleSort<T>::sortArray(T * arr, size_t size)
+void BubbleSort<T>::sortArray(T * arr, size_t size)
 {
 	for (size_t i = 0; i < size-1; i++) {
 		bool swapped = false;
