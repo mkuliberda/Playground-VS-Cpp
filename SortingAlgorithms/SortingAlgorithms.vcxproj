@@ -152,7 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BubbleSort.cpp" />
     <ClCompile Include="SortingAlgorithms.cpp" />
   </ItemGroup>
   <ItemGroup>

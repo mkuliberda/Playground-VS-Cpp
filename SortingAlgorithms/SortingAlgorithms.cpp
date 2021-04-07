@@ -2,17 +2,20 @@
 //
 
 #include <iostream>
+#include <array>
 #include "BubbleSort.h"
 
 int main()
 {
 	BubbleSort<int> sorter1;
+	BubbleSort<char> sorter2;
 	int ex_array[] = { 1, 5, 7, 4, 0, 2, 3 };
-	size_t arr_size = sizeof(ex_array) / sizeof(ex_array[0]);
-	sorter1.sortArray(ex_array, arr_size);
+	char ch_array[] = {'a', 'g', '7', 'x', 'j'};
+	size_t arr_size = sizeof(ch_array) / sizeof(ch_array[0]);
+	sorter2.sortArray(ch_array, arr_size);
 
 	for (size_t i = 0; i < arr_size; ++i) {
-		std::cout << ex_array[i] << " ";
+		std::cout << ch_array[i] << " ";
 	}
 }
 
