@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include <map>
 
 
@@ -9,7 +10,8 @@ enum recipient_t : uint8_t {
 	ntp_server,
 	raspberry_pi,
 	google_home,
-	my_phone
+	my_phone,
+	broadcast
 };
 
 class MsgBroker
@@ -17,10 +19,11 @@ class MsgBroker
 public:
 	virtual bool assignDevice(void* DevHandle) =0;
 	virtual bool sendMsg(const recipient_t& _recipient, const std::string& _msg) =0;
-	virtual bool publishData(const recipient_t& _recipient, std::map<std::string_view, double> *values) =0;
-	virtual bool publishData(const recipient_t& _recipient, std::map<std::string_view, uint8_t> *values) = 0;
-	virtual double requestData(const recipient_t& _recipient, const std::string_view& _data_addr) =0;
-	virtual ~MsgBroker() =0;
+	virtual bool publishData(const recipient_t& _recipient, const char* _publisher, const std::map<const char*, double> &_values) =0;
+	virtual bool requestData(const recipient_t& _recipient, const std::string& _data_key) =0;
+	virtual ~MsgBroker() =default;
 
 };
+
+using MsgBrokerPtr = std::unique_ptr<MsgBroker>; //alias for MsgBroker pointer
 

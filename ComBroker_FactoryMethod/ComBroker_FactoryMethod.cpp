@@ -2,10 +2,19 @@
 //
 
 #include <iostream>
+#include "HAL_UART_MsgBroker.h"
+#include "MsgBrokerFactory.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
+	MsgBrokerPtr p_broker;
+	p_broker = MsgBrokerFactory::create(msg_broker_type_t::hal_uart);
+
+
+	p_broker->publishData(recipient_t::google_home, "Pelargonia", { { "Soil moisture", 67.0 }, { "is exposed", 0.0 } });
+	p_broker->sendMsg(recipient_t::google_home, "Pelargonia");
+	p_broker->requestData(recipient_t::ntp_server, "CurrentTime");
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

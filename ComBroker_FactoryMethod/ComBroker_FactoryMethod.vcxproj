@@ -155,10 +155,12 @@
   <ItemGroup>
     <ClCompile Include="ComBroker_FactoryMethod.cpp" />
     <ClCompile Include="HAL_UART_MsgBroker.cpp" />
+    <ClCompile Include="MsgBrokerFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HAL_UART_MsgBroker.h" />
     <ClInclude Include="MsgBroker.h" />
+    <ClInclude Include="MsgBrokerFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

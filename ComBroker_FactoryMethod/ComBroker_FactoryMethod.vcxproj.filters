@@ -21,12 +21,18 @@
     <ClCompile Include="HAL_UART_MsgBroker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MsgBrokerFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MsgBroker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HAL_UART_MsgBroker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgBrokerFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
