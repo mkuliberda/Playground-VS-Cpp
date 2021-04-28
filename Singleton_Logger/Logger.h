@@ -3,6 +3,10 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <string_view>
 
 // This is now Meyer's singleton
 
@@ -10,6 +14,8 @@
 #define FA_OPEN_APPEND 1
 #define FR_OK (bool)true;
 #define LOG_TEXT_LEN 28
+#define TIME_FORMAT "%02d-%02d-%02d %02d:%02d:%02d.%03d"
+#define TIME_FORMAT_LEN (sizeof(TIME_FORMAT))
 
 #define REPORTERS C(Sector1)C(Sector2)C(Sector3)C(Sector4)C(Task_SDCard)C(Task_Irrigation)C(Task_Wireless)C(Task_SysMonitor)C(Generic)
 #define C(x) x,
@@ -62,6 +68,8 @@ private:
 	DIR directory;
 	FILINFO file_info;
 	char cwd_buffer[80] = "/";
+	const char time_format[TIME_FORMAT_LEN] = TIME_FORMAT;
+	std::vector<std::pair<std::string_view, int>> logs;
 
 	HAL_FatFs_Logger() {};
 
@@ -73,5 +81,7 @@ public:
 	static HAL_FatFs_Logger& createInstance();
 	void writeLog(log_msg *msg);
 	void setMsgMaxLength(const uint32_t& _log_text_max_len);
+	void accumulateLogs();
+	void releaseLogsToFile();
 
 };

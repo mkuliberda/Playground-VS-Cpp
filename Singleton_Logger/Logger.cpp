@@ -43,3 +43,24 @@ void HAL_FatFs_Logger::setMsgMaxLength(const uint32_t & _log_text_max_len)
 {
 	if (_log_text_max_len > 0) log_text_max_len = _log_text_max_len;
 }
+
+
+void HAL_FatFs_Logger::accumulateLogs() {
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.835", 6));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.300", 5));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.296", 4));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.835", 7));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.000", 2));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.117", 3));
+	logs.emplace_back(std::make_pair("20-09-14 18:59:50.000", 1));
+
+}
+
+void HAL_FatFs_Logger::releaseLogsToFile() {
+	std::sort(logs.begin(), logs.end());
+	for (const auto& log : logs) {
+		std::cout << log.second << std::endl;
+		//writeLog(log.second, log_file);
+	}
+	logs.clear();
+}

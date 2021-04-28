@@ -11,6 +11,15 @@ int main()
 	MsgBrokerPtr p_broker;
 	p_broker = MsgBrokerFactory::create(msg_broker_type_t::hal_uart);
 
+	std::map<std::string, double> items;
+	uint8_t test_val = 7;
+
+	items["item1"] = 2.4;
+	items["item2"] = 2.7;
+
+	for (const auto&[key, value] : items) {
+		std::cout << key << ":" << value << std::endl;
+	}
 
 	p_broker->publishData(recipient_t::google_home, "Pelargonia", { { "Soil moisture", 67.0 }, { "is exposed", 0.0 } });
 	p_broker->sendMsg(recipient_t::google_home, "Pelargonia");

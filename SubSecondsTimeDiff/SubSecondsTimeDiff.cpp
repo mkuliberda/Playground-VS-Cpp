@@ -27,33 +27,35 @@ double calculateTimeDiff(const TimeStamp_t& _past, const TimeStamp_t& _now) {
 	time_t now = mktime(&tm_timestamp_now);
 	time_t past = mktime(&tm_timestamp_past);
 
-	typedef std::chrono::milliseconds milliseconds;
-	std::chrono::system_clock::time_point t_now = std::chrono::system_clock::from_time_t(now) + std::chrono::milliseconds(_now.milliseconds);
-	std::chrono::system_clock::time_point t_past = std::chrono::system_clock::from_time_t(past) + std::chrono::milliseconds(_past.milliseconds);
-	auto dt_ms = std::chrono::duration_cast<milliseconds>(t_now - t_past);
+	using milliseconds = std::chrono::milliseconds;
 
-	return dt_ms.count() / 1000.0;
+	auto tp_now = std::chrono::system_clock::from_time_t(now);
+	tp_now += milliseconds(_now.milliseconds);
+	auto tp_past = std::chrono::system_clock::from_time_t(past);
+	tp_past += milliseconds(_past.milliseconds);
+	std::chrono::duration<double, std::milli>  dt_ms = tp_now - tp_past;
+
+	return dt_ms.count() /1000.0;
 }
 
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	TimeStamp_t now{ 6,17,01,00,18,4,21,900 };
+	TimeStamp_t now{ 6,17,01,1,18,4,21,900 };
 	TimeStamp_t prev{ 6,17,01,00,18,4,21,0 };
 
     std::cout << "Hello World!\n";
 	uint32_t i = 0;
-	while (true) {
-
 		double result = calculateTimeDiff(prev, now);
 		std::cout << result << std::endl;
 		prev = { now };
-		now = { 6,17,2,00,18,4,21,100+i };
+		now = { 6,17,2,00,18,4,21,0 };
 		result = calculateTimeDiff(prev, now);
 		std::cout << result << std::endl;
-		i++;
+
+
+		
 		//Sleep(200);
-	}
 
 }
 

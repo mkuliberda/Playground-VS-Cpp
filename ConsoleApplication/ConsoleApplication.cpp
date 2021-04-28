@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <queue>
 #include <map>
+#include <set>
 
 
 namespace rest {
@@ -511,6 +512,34 @@ void func_pointer_test() {
 	std::cout << pubLogMsgPtr("Example text", 26) << std::endl;
 }
 
+void set_test(){
+	int arr[] = { 1, 6, 4, 9, 7 };
+
+	auto t = arr[0];
+	for (size_t i = 0; i < sizeof(arr) / sizeof(int); ++i) {
+		if (t < arr[i]) t = arr[i];
+	}
+	std::cout <<"max: "<< t << std::endl;
+
+	t = arr[0];
+	for (size_t i = 0; i < sizeof(arr) / sizeof(int); ++i) {
+		if (t > arr[i]) t = arr[i];
+	}
+	std::cout << "min: " << t << std::endl;
+
+	std::set<int> set_arr{};
+	for (size_t i = 0; i < sizeof(arr)/sizeof(int); ++i){
+		set_arr.insert(arr[i]);
+		}
+
+	for (const auto& item : set_arr) {
+		std::cout << item << std::endl;
+	}
+}
+
+
+
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -574,12 +603,14 @@ int main()
 	//std::cout << *ptr << std::endl;
 	//heapbased_2darray(rows,cols);
 
-	func_pointer_test();
+	//func_pointer_test();
+	set_test();
+	std::cin;
 
 	while (1) {
-		const char *request = new char[43]{ "GET:Time                                  " };
-		std::cout << request << std::endl;
-		delete request;
+		//const char *request = new char[43]{ "GET:Time                                  " };
+		//std::cout << request << std::endl;
+		//delete request;
 		//decorator_test();
 		//builder_test();
 		//bridge_test();
@@ -607,7 +638,7 @@ int main()
 		//if (watering) std::cout << "controller1 update: " << dt << " watering true" << std::endl;
 		//else std::cout << "controller1 update: " << dt << " watering false" << std::endl;
 		
-		Sleep(100);
+		Sleep(1000);
 		dt += 100.0_msec;
 		//hysteresis_test(dt);
 

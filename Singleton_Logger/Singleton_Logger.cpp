@@ -6,6 +6,7 @@
 #include "Logger.h"
 
 
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -19,6 +20,11 @@ int main()
 	logger1.writeLog(&sys_message);
 
 	std::cout << &logger1 << " " << &logger << std::endl;
+
+	logger1.accumulateLogs();
+	logger1.releaseLogsToFile();
+	logger1.accumulateLogs();
+	logger1.releaseLogsToFile();
 
 }
 
