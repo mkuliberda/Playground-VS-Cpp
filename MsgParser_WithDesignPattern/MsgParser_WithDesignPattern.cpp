@@ -66,7 +66,7 @@ struct JsonSerializer :Visitor {
 	}
 
 	void visit(const ListItem& li) override {
-		oss << "{\"" << li.text <<"\":\""<< li.text << "\"},";
+		oss << "{\"" << li.text << "\":\"" << li.text << "\"},";
 	}
 
 	void visit(const Footer& li) override {
@@ -74,10 +74,39 @@ struct JsonSerializer :Visitor {
 	}
 
 	void visit(const List& l) override {
-		//oss << "{";
 		for (const auto& item : l) {
 			item.accept(*this);
 		}
+		oss.seekp(-1, std::ios_base::end);		
+	}
+
+	std::string str() const override {
+		return oss.str();
+	}
+
+private:
+	std::ostringstream oss;
+};
+
+struct SmsSerializer :Visitor {
+
+	void visit(const Header& p) override {
+		oss << "[" << p.text << p.text << ": ";
+	}
+
+	void visit(const ListItem& li) override {
+		oss << li.text << "-" << li.text << ", ";
+	}
+
+	void visit(const Footer& li) override {
+		oss << "]\n";
+	}
+
+	void visit(const List& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss.seekp(-2, std::ios_base::end);
 	}
 
 	std::string str() const override {
@@ -105,7 +134,7 @@ int main()
 		{
 			item->accept(jsonizer);
 		}
-		std::cout << jsonizer.str() << std::endl;
+		std::cout << jsonizer.str();
 	}
 
 	{
@@ -116,13 +145,13 @@ int main()
 
 		List list{ l3, l4 };
 		std::vector<Element*> document{ &p, &list, &end };
-		JsonSerializer jsonizer;
+		SmsSerializer smsizer;
 
 		for (auto item : document)
 		{
-			item->accept(jsonizer);
+			item->accept(smsizer);
 		}
-		std::cout << jsonizer.str() << std::endl;
+		std::cout << smsizer.str();
 	}
 
 
