@@ -1,19 +1,22 @@
 #pragma once
 #include <string>
+#include <utility>
 #include <vector>
 #include "Messages.h"
 
+struct Footer;
 struct List;
 struct ListItem;
-struct Paragraph;
+struct Header;
 
 struct Visitor
 {
 	virtual ~Visitor() = default;
 
-	virtual void visit(const Paragraph& p) = 0;
+	virtual void visit(const Header& p) = 0;
 	virtual void visit(const ListItem& p) = 0;
 	virtual void visit(const List& p) = 0;
+	virtual void visit(const Footer& p) = 0;
 
 	virtual std::string str() const = 0;
 };
@@ -28,16 +31,16 @@ struct TextMessage : Element
 {
 	std::string text;
 
-	explicit TextMessage(const std::string& text)
-		: text(text)
+	explicit TextMessage(std::string&& text)
+		: text(std::move(text))
 	{
 	}
 };
 
-struct Paragraph : TextMessage
+struct Header : TextMessage
 {
-	explicit Paragraph(const std::string& text)
-		: TextMessage(text)
+	explicit Header(std::string&& text)
+		: TextMessage(std::move(text))
 	{
 	}
 
@@ -50,8 +53,22 @@ struct Paragraph : TextMessage
 
 struct ListItem : TextMessage
 {
-	explicit ListItem(const std::string& text)
-		: TextMessage(text)
+	explicit ListItem(std::string&& text)
+		: TextMessage(std::move(text))
+	{
+	}
+
+
+	void accept(Visitor& v) const override
+	{
+		v.visit(*this);
+	}
+};
+
+struct Footer : TextMessage
+{
+	explicit Footer(std::string&& text)
+		: TextMessage(std::move(text))
 	{
 	}
 
@@ -64,8 +81,8 @@ struct ListItem : TextMessage
 
 struct List : std::vector<ListItem>, Element
 {
-	List(const std::initializer_list<value_type>& _Ilist)
-		: std::vector<ListItem>(_Ilist)
+	List(const std::initializer_list<value_type>& _ilist)
+		: std::vector<ListItem>(_ilist)
 	{
 	}
 

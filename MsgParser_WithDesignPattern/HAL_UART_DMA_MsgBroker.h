@@ -24,11 +24,12 @@ public:
     }
 	bool assignDevice(void* _dev_handle) override;
 	bool sendMsg(const ExternalObject& _recipient, const std::string& _msg, const bool& _wait_until_cplt = false) override;
-	bool publishData(const ExternalObject& _recipient, const char* _publisher, std::unordered_map<const char*, int32_t> _values, const bool& _wait_until_cplt = false) override;
+	bool publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<const char*, int32_t> _values, const bool& _wait_until_cplt = false) override;
 	bool requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt = false) override;
 	//bool setParser(MsgParser *_parser) override;
 	// setEncoder(MsgEncoder *_encoder) override;
-	void setAddresses(std::unordered_map<ExternalObject_t, std::string> &_addresses) override;
+	void setExternalAddresses(std::unordered_map<ExternalObject_t, std::string> &_addresses) override;
+	void setInternalAddresses(std::unordered_map<InternalObject_t, std::string> &_addresses) override;
 	bool readData(const size_t& _size, void(*action)(const std::string&)) override;
 	bool readData(const size_t& _size) override;
 	HAL_UART_DMA_MsgBroker(HAL_UART_DMA_MsgBroker const &) = delete;
@@ -44,7 +45,8 @@ private:
 	UART_HandleTypeDef *UART_Handle{};
 	uint8_t txBuffer[BUFFER_SIZE]{};
 	uint8_t rxBuffer[BUFFER_SIZE]{};
-	std::unordered_map<ExternalObject_t, std::string> address_map;
+	std::unordered_map<ExternalObject_t, std::string> ext_address_map;
+	std::unordered_map<InternalObject_t, std::string> int_address_map;
 	//MsgParser *parserInstance{};
 	bool devValid{false};
 };

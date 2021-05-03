@@ -7,6 +7,7 @@
 #include "Messages.h"
 #include "MsgBroker.h"
 #include "MsgBrokerFactory.h"
+#include "MsgEncoder.h"
 #include "stm32f4xx_hal.h"
 #include "utilities.h"
 
@@ -58,10 +59,71 @@ void GsmTask()
 	
 }
 
+struct JsonSerializer :Visitor {
+
+	void visit(const Header& p) override {
+		oss << "{\"" << p.text << "\":";
+	}
+
+	void visit(const ListItem& li) override {
+		oss << "{\"" << li.text <<"\":\""<< li.text << "\"},";
+	}
+
+	void visit(const Footer& li) override {
+		oss << "}\n";
+	}
+
+	void visit(const List& l) override {
+		//oss << "{";
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+	}
+
+	std::string str() const override {
+		return oss.str();
+	}
+
+private:
+	std::ostringstream oss;
+};
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	{
+		Header p{ "Hi" };
+		ListItem l1{ "red" };
+		ListItem l2{ "blue" };
+		Footer end{ "dummy" };
 
+		List list{ l1, l2 };
+		std::vector<Element*> document{ &p, &list, &end };
+		JsonSerializer jsonizer;
+
+		for (auto item : document)
+		{
+			item->accept(jsonizer);
+		}
+		std::cout << jsonizer.str() << std::endl;
+	}
+
+	{
+		Header p{ "Hello" };
+		ListItem l3{ "redd" };
+		ListItem l4{ "blu" };
+		Footer end{ "dummy" };
+
+		List list{ l3, l4 };
+		std::vector<Element*> document{ &p, &list, &end };
+		JsonSerializer jsonizer;
+
+		for (auto item : document)
+		{
+			item->accept(jsonizer);
+		}
+		std::cout << jsonizer.str() << std::endl;
+	}
 
 
 	getchar();
