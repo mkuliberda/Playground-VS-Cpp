@@ -2,56 +2,66 @@
 //
 
 #include <iostream>
-#include "model.hpp"
-#include "visitor.hpp"
 #include <algorithm>
 #include <sstream>
+#include "Messages.h"
+#include "MsgBroker.h"
+#include "MsgBrokerFactory.h"
+#include "stm32f4xx_hal.h"
+#include "utilities.h"
 
-using namespace std;
 
-struct HtmlVisitor :Visitor {
+UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
+#define EXT_TIME_FORMAT "{\"NTP999>SYS000\":{\"CTD\":\"200914Mon185950\"}}" //Current Time Date
+#define EXT_TIME_STR_LEN (sizeof(EXT_TIME_FORMAT)-1)
 
-	void visit(const Paragraph& p) override {
-		oss << "<p>" << p.text << "</p>\n";
+//{\"MAN999>SEC000\":{\"CMD\":\"Irrigation start\"}}
+//{\"MAN999>SEC002\":{\"CMD\":\"Irrigation stop\"}}
+
+void WirelessTask()
+{
+	MsgBrokerPtr p_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
+
+	{
+		p_broker->requestData({ ExternalObject_t::ntp_server, 999 }, "CurrentTime", true);
+		//Message msg = p_broker->readData(EXT_TIME_STR_LEN);
+		//msg.apply();
 	}
 
-	void visit(const ListItem& li) override {
-		oss << "<li>" << li.text << "</li>\n";
-	}
+	int query = 3;
 
-	void visit(const List& l) override {
-		oss << "<ul>\n";
-		for (const auto& item : l){
-			item.accept(*this);
+	while (true)
+	{
+		if (query == 1 /*some task requested sth */) {
+			p_broker->requestData({ExternalObject_t::raspberry_pi, 999}, "sth", true);
+			p_broker->readData(255);
 		}
-		oss << "</ul>\n";
+		else if (query == 2 /*another task requested sth */) {
+			p_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, "sth else", true);
+			p_broker->readData(128);
+		}
+		//...
 	}
+}
 
-	string str() const override {
-		return oss.str();
+void GsmTask()
+{
+	MsgBrokerPtr p_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart3);
+
+	while (true)
+	{
+		p_broker->readData(255);
+		
+		
 	}
-
-private:
-	ostringstream oss;
-};
+	
+}
 
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	Paragraph p{"some colors"};
-	ListItem red{ "red" };
-	ListItem green{ "green" };
-	ListItem blue{ "blue" };
-
-	List list{red, green, blue};
-	vector<Element*> document{ &p, &list };
-	HtmlVisitor v;
-
-	for (auto item : document) {
-		item->accept(v);
-	}
-	cout << v.str() << endl;
 
 
 	getchar();

@@ -152,11 +152,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HAL_UART_DMA_MsgBroker.cpp" />
+    <ClCompile Include="MsgBrokerFactory.cpp" />
     <ClCompile Include="MsgParser_WithDesignPattern.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="model.hpp" />
-    <ClInclude Include="visitor.hpp" />
+    <ClInclude Include="cmsis_os.h" />
+    <ClInclude Include="HAL_UART_DMA_MsgBroker.h" />
+    <ClInclude Include="Messages.h" />
+    <ClInclude Include="MsgBroker.h" />
+    <ClInclude Include="MsgBrokerFactory.h" />
+    <ClInclude Include="MsgEncoder.h" />
+    <ClInclude Include="rtc.h" />
+    <ClInclude Include="stm32f4xx_hal.h" />
+    <ClInclude Include="utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

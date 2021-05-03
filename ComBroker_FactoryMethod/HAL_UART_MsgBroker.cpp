@@ -12,14 +12,14 @@ bool HAL_UART_Receive_DMA(UART_HandleTypeDef *uart, uint8_t *buffer, unsigned sh
 	return true;
 }
 
-bool HAL_UART_MsgBroker::assignDevice(void * DevHandle)
+bool HAL_UART_DMA_MsgBroker::assignDevice(void * _dev_handle)
 {
-	if (DevHandle == nullptr) return false;
-	UART_Handle = (UART_HandleTypeDef*)DevHandle;
+	if (_dev_handle == nullptr) return false;
+	UART_Handle = (UART_HandleTypeDef*)_dev_handle;
 	return true;
 }
 
-bool HAL_UART_MsgBroker::sendMsg(const recipient_t& _recipient, const std::string& _msg)
+bool HAL_UART_DMA_MsgBroker::sendMsg(const recipient_t& _recipient, const std::string& _msg)
 {
 	std::string str_msg{pub_hdr};
 	bool result = false;
@@ -43,7 +43,7 @@ bool HAL_UART_MsgBroker::sendMsg(const recipient_t& _recipient, const std::strin
 	return result;
 }
 
-bool HAL_UART_MsgBroker::publishData(const recipient_t& _recipient, const char* _publisher, const std::map<const char*, double> &_values)
+bool HAL_UART_DMA_MsgBroker::publishData(const recipient_t& _recipient, const char* _publisher, const std::map<const char*, double> &_values)
 {
 	std::string str_msg{ "{\"" };
 	str_msg += _publisher;
@@ -83,7 +83,7 @@ bool HAL_UART_MsgBroker::publishData(const recipient_t& _recipient, const char* 
 	return result;
 }
 
-bool HAL_UART_MsgBroker::requestData(const recipient_t& _recipient, const std::string& _data_key)
+bool HAL_UART_DMA_MsgBroker::requestData(const recipient_t& _recipient, const std::string& _data_key)
 {
 	std::string str_msg{ get_hdr };
 	bool result = false;

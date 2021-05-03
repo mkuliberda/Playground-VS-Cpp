@@ -12,20 +12,20 @@ struct Element
 	virtual void accept(Visitor& v) const = 0;
 };
 
-struct TextElement : Element
+struct TextMessage : Element
 {
 	string text;
 
-	explicit TextElement(const string& text)
+	explicit TextMessage(const string& text)
 		: text(text)
 	{
 	}
 };
 
-struct Paragraph : TextElement
+struct Paragraph : TextMessage
 {
 	explicit Paragraph(const string& text)
-		: TextElement(text)
+		: TextMessage(text)
 	{
 	}
 
@@ -36,10 +36,10 @@ struct Paragraph : TextElement
 	}
 };
 
-struct ListItem : TextElement
+struct ListItem : TextMessage
 {
 	explicit ListItem(const string& text)
-		: TextElement(text)
+		: TextMessage(text)
 	{
 	}
 

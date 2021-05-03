@@ -19,12 +19,12 @@ bool HAL_UART_Receive_DMA(UART_HandleTypeDef *uart, uint8_t *buffer, unsigned sh
 
 #define RX_BUFFER_SIZE 64
 
-class HAL_UART_MsgBroker :
+class HAL_UART_DMA_MsgBroker :
 	public MsgBroker
 {
 public:
-	~HAL_UART_MsgBroker() =default;
-	bool assignDevice(void* DevHandle) override;
+	~HAL_UART_DMA_MsgBroker() =default;
+	bool assignDevice(void* _dev_handle) override;
 	bool sendMsg(const recipient_t& _recipient, const std::string& _msg) override;
 	bool publishData(const recipient_t& _recipient, const char* _publisher, const std::map<const char*, double> &_values) override;
 	bool requestData(const recipient_t& _recipient, const std::string& _data_key) override;

@@ -35,6 +35,32 @@ private:
 	ostringstream oss;
 };
 
+struct MarkdownVisitor :Visitor {
+
+	void visit(const Paragraph& p) override {
+		oss << "P " << p.text << "\n";
+	}
+
+	void visit(const ListItem& li) override {
+		oss << "L " << li.text << "\n";
+	}
+
+	void visit(const List& l) override {
+		oss << "U \n";
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss << "\n";
+	}
+
+	string str() const override {
+		return oss.str();
+	}
+
+private:
+	ostringstream oss;
+};
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -48,10 +74,17 @@ int main()
 	vector<Element*> document{ &p, &list };
 	HtmlVisitor v;
 
+
 	for (auto item : document) {
 		item->accept(v);
 	}
 	cout << v.str() << endl;
+
+	MarkdownVisitor m;
+	for (auto item : document) {
+		item->accept(m);
+	}
+	cout << m.str() << endl;
 
 
 	getchar();

@@ -17,7 +17,7 @@ enum recipient_t : uint8_t {
 class MsgBroker
 {
 public:
-	virtual bool assignDevice(void* DevHandle) =0;
+	virtual bool assignDevice(void* _dev_handle) =0;
 	virtual bool sendMsg(const recipient_t& _recipient, const std::string& _msg) =0;
 	virtual bool publishData(const recipient_t& _recipient, const char* _publisher, const std::map<const char*, double> &_values) =0;
 	virtual bool requestData(const recipient_t& _recipient, const std::string& _data_key) =0;

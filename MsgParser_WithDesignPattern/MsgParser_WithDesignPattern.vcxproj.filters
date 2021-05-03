@@ -18,12 +18,39 @@
     <ClCompile Include="MsgParser_WithDesignPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MsgBrokerFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HAL_UART_DMA_MsgBroker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="visitor.hpp">
+    <ClInclude Include="MsgBrokerFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model.hpp">
+    <ClInclude Include="stm32f4xx_hal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgBroker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cmsis_os.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HAL_UART_DMA_MsgBroker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgEncoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
