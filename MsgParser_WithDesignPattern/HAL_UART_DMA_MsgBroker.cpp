@@ -23,15 +23,15 @@ bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std
 
 	switch (_recipient.object) {
 	case ExternalObject_t::raspberry_pi:
-		str_msg += ext_address_map[ExternalObject_t::raspberry_pi] + msg_start + _msg + msg_end + msg_ending;
+		str_msg += ext_address_map->at(ExternalObject_t::raspberry_pi) + msg_start + _msg + msg_end + msg_ending;
         result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::google_home:
-		str_msg += ext_address_map[ExternalObject_t::google_home] + msg_start + _msg + msg_end + msg_ending;
+		str_msg +=  ext_address_map->at(ExternalObject_t::google_home) + msg_start + _msg + msg_end + msg_ending;
         result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::broadcast:
-		str_msg += ext_address_map[ExternalObject_t::broadcast] + msg_start + _msg + msg_end + msg_ending;
+		str_msg +=  ext_address_map->at(ExternalObject_t::broadcast) + msg_start + _msg + msg_end + msg_ending;
         result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::ntp_server:
@@ -44,25 +44,27 @@ bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std
 	return result;
 }
 
-bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<const char*, int32_t> _values, const bool& _wait_until_cplt)
+bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt)
 {
-	/*Header hdr{ _recipient };
-	DataList data{_values};
-	Footer ft {"}\n"};
-
-	std::vector<Element*> msg_items{ &hdr, &data, &ft };
-	JsonEncoder json_encoder;
-
-	for (auto &item: msg_items)
+	std::string id_str = std::to_string(_publisher.id);
+	std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
+	id_str = std::to_string(_recipient.id);
+	std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
+	Header hdr{ int_address_map->at(_publisher.object) + pub_id,  ext_address_map->at(_recipient.object) + rcv_id};
+	Data data_list{};
+	Footer end{ "", "" };
+	for (auto &[key,value]: _values)
 	{
-		item.accept(&json_encoder);
+		DataItem item{key, std::to_string(value)};
+		data_list.emplace_back(item);
 	}
-	*/
-	
-	
+	std::vector<Element*> msg_items{ &hdr, &data_list, &end };
+	for (auto &item : msg_items) item->accept(*encoder);
+
+	std::cout << encoder->str();
 	
 	std::string str_msg{ "{\"" };
-	str_msg += int_address_map[_publisher.object];
+	str_msg += int_address_map->at(_publisher.object);
 	str_msg += "\":[";
 	bool result = false;
 
@@ -80,15 +82,15 @@ bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const
 
 	switch (_recipient.object) {
 	case ExternalObject_t::raspberry_pi:
-		str_msg = (static_cast<std::string>(pub_hdr) + ext_address_map[ExternalObject_t::raspberry_pi] + str_msg);
+		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::raspberry_pi) + str_msg);
         result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::google_home:
-		str_msg = (static_cast<std::string>(pub_hdr) + ext_address_map[ExternalObject_t::google_home] + str_msg);
+		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::google_home) + str_msg);
 		result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::broadcast:
-		str_msg = (static_cast<std::string>(pub_hdr) + ext_address_map[ExternalObject_t::broadcast] + str_msg);
+		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::broadcast) + str_msg);
 		result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::ntp_server:
@@ -108,15 +110,15 @@ bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const
 
 	switch (_recipient.object) {
 	case ExternalObject_t::raspberry_pi:
-		str_msg += ext_address_map[ExternalObject_t::raspberry_pi] + _data_key + msg_ending;
+		str_msg +=  ext_address_map->at(ExternalObject_t::raspberry_pi) + _data_key + msg_ending;
 		result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::google_home:
-		str_msg += ext_address_map[ExternalObject_t::google_home] + _data_key + msg_ending;
+		str_msg +=  ext_address_map->at(ExternalObject_t::google_home) + _data_key + msg_ending;
 		result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::ntp_server:
-		str_msg += ext_address_map[ExternalObject_t::ntp_server] + _data_key + msg_ending;
+		str_msg +=  ext_address_map->at(ExternalObject_t::ntp_server) + _data_key + msg_ending;
         result = transmit(str_msg, _wait_until_cplt);
 		break;
 	case ExternalObject_t::my_phone:
@@ -136,15 +138,17 @@ bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const
 // 	}
 // 	return false;
 // }
-// bool HAL_UART_DMA_MsgBroker::setEncoder(MsgEncoder *_encoder){
-// 	return false;
-// }
+ bool HAL_UART_DMA_MsgBroker::setEncoder(Visitor*_encoder){
+	 if (_encoder == nullptr) return false;
+	 encoder = _encoder;
+	 return true;
+ }
 
-void HAL_UART_DMA_MsgBroker::setExternalAddresses(std::unordered_map<ExternalObject_t, std::string>& _addresses)
+void HAL_UART_DMA_MsgBroker::setExternalAddresses(std::unordered_map<ExternalObject_t, std::string> *_addresses)
 {
 	ext_address_map = _addresses;
 }
-void HAL_UART_DMA_MsgBroker::setInternalAddresses(std::unordered_map<InternalObject_t, std::string>& _addresses)
+void HAL_UART_DMA_MsgBroker::setInternalAddresses(std::unordered_map<InternalObject_t, std::string> *_addresses)
 {
 	int_address_map = _addresses;
 }

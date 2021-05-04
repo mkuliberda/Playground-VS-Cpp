@@ -62,18 +62,18 @@ void GsmTask()
 struct JsonSerializer :Visitor {
 
 	void visit(const Header& p) override {
-		oss << "{\"" << p.text << "\":";
+		oss << "{\"" << p.text1 <<">"<< p.text2 << "\":";
 	}
 
-	void visit(const ListItem& li) override {
-		oss << "{\"" << li.text << "\":\"" << li.text << "\"},";
+	void visit(const DataItem& li) override {
+		oss << "{\"" << li.text1 << "\":\"" << li.text2 << "\"},";
 	}
 
 	void visit(const Footer& li) override {
-		oss << "}\n";
+		oss << "}\n" << li.text1 << li.text2;
 	}
 
-	void visit(const List& l) override {
+	void visit(const Data& l) override {
 		for (const auto& item : l) {
 			item.accept(*this);
 		}
@@ -91,18 +91,18 @@ private:
 struct SmsSerializer :Visitor {
 
 	void visit(const Header& p) override {
-		oss << "[" << p.text << p.text << ": ";
+		oss << "[" << p.text1 <<" "<< p.text2 << ": ";
 	}
 
-	void visit(const ListItem& li) override {
-		oss << li.text << "-" << li.text << ", ";
+	void visit(const DataItem& li) override {
+		oss << li.text1 << "-" << li.text2 << ", ";
 	}
 
 	void visit(const Footer& li) override {
 		oss << "]\n";
 	}
 
-	void visit(const List& l) override {
+	void visit(const Data& l) override {
 		for (const auto& item : l) {
 			item.accept(*this);
 		}
@@ -121,12 +121,13 @@ int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	{
-		Header p{ "Hi" };
-		ListItem l1{ "red" };
-		ListItem l2{ "blue" };
-		Footer end{ "dummy" };
+		Header p{ "Hi" , "Asia"};
+		DataItem l1{ "red", "1" };
+		DataItem l2{ "blue", "0" };
+		Footer end{ "", "" };
 
-		List list{ l1, l2 };
+		Data list{ l1, l2 };
+		list.push_back(l1);
 		std::vector<Element*> document{ &p, &list, &end };
 		JsonSerializer jsonizer;
 
@@ -138,12 +139,12 @@ int main()
 	}
 
 	{
-		Header p{ "Hello" };
-		ListItem l3{ "redd" };
-		ListItem l4{ "blu" };
-		Footer end{ "dummy" };
+		Header p{ "Hello" , "Mateusz"};
+		DataItem l3{ "redd", "" };
+		DataItem l4{ "blu", "" };
+		Footer end{ "", "" };
 
-		List list{ l3, l4 };
+		Data list{ l3, l4 };
 		std::vector<Element*> document{ &p, &list, &end };
 		SmsSerializer smsizer;
 
@@ -153,6 +154,14 @@ int main()
 		}
 		std::cout << smsizer.str();
 	}
+
+	MsgBrokerPtr json_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
+	JsonSerializer jsonizer;
+	json_msg_broker->setEncoder(&jsonizer);
+	json_msg_broker->setInternalAddresses(&internal_entities);
+	json_msg_broker->setExternalAddresses(&esp01s_external_addresses);
+
+	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 },  { {"Soil moisture", 18}, {"Type", 2} });
 
 
 	getchar();
