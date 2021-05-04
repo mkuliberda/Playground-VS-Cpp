@@ -4,6 +4,8 @@
 #include <cstring>
 #include "cmsis_os.h"
 
+//TODO: check if MsgBrokers can be implemented with Strategy design pattern
+
 //extern const UBaseType_t xArrayIndex; //TODO: uncomment on STM32
 
 bool HAL_UART_DMA_MsgBroker::assignDevice(void * _dev_handle)
