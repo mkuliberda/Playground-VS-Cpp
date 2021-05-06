@@ -8,14 +8,14 @@
 
 //extern const UBaseType_t xArrayIndex; //TODO: uncomment on STM32
 
-bool HAL_UART_DMA_MsgBroker::assignDevice(void * _dev_handle)
+bool HAL_UART_DMA_MsgBroker::assignDevice(DevHandle *_dev_handle)
 {
 	if (_dev_handle == nullptr) return false;
-	UART_Handle = (UART_HandleTypeDef*)_dev_handle;
+	UART_Handle = _dev_handle;
 	return devValid = true;
 }
 
-bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std::string& _msg, const bool& _wait_until_cplt)
+bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std::string& _msg, Encoder *_encoder, const bool& _wait_until_cplt)
 {	
 	
 	std::string str_msg{pub_hdr};
@@ -46,29 +46,41 @@ bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std
 	return result;
 }
 
-bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt)
+bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt, Encoder *_encoder)
 {
-	std::string id_str = std::to_string(_publisher.id);
+	_ASSERT(_publisher.id > 999 || _recipient.id > 999);
+
+	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
 	std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
-	id_str = std::to_string(_recipient.id);
+	id_str = std::to_string(_recipient.id); //TODO: patch::to_string
 	std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
+	
 	Header hdr{ int_address_map->at(_publisher.object) + pub_id,  ext_address_map->at(_recipient.object) + rcv_id};
 	Data data_list{};
 	Footer end{ "", "" };
+	
 	for (auto &[key,value]: _values)
 	{
-		DataItem item{key, std::to_string(value)};
+		DataItem item{key, std::to_string(value)}; //TODO: patch::to_string
 		data_list.emplace_back(item);
 	}
-	std::vector<Element*> msg_items{ &hdr, &data_list, &end };
-	for (auto &item : msg_items) item->accept(*encoder);
 
-	std::cout << encoder->str();
+	if (std::vector<Element*> msg_items{ &hdr, &data_list, &end }; _encoder != nullptr) {
+		for (auto &item : msg_items) item->accept(*_encoder);
+		return transmit(_encoder->str(), _wait_until_cplt);
+	}
+	else if(encoder != nullptr)
+	{
+		for (auto &item : msg_items) item->accept(*encoder);
+		return transmit(encoder->str(), _wait_until_cplt);
+	}
+
+	return false;
 	
-	std::string str_msg{ "{\"" };
+	/*std::string str_msg{ "{\"" };
 	str_msg += int_address_map->at(_publisher.object);
 	str_msg += "\":[";
-	bool result = false;
+
 
 	for (const auto& kv : _values) {
 		str_msg += '\"';
@@ -102,10 +114,10 @@ bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const
 	default:
 		break;
 	}
-	return result;
+	return result;*/
 }
 
-bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt)
+bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const std::string& _data_key, Encoder *_encoder, const bool& _wait_until_cplt)
 {
 	std::string str_msg{ get_hdr };
 	bool result = false;
@@ -140,7 +152,7 @@ bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const
 // 	}
 // 	return false;
 // }
- bool HAL_UART_DMA_MsgBroker::setEncoder(Visitor*_encoder){
+ bool HAL_UART_DMA_MsgBroker::setEncoder(Encoder*_encoder){
 	 if (_encoder == nullptr) return false;
 	 encoder = _encoder;
 	 return true;
@@ -186,8 +198,9 @@ bool HAL_UART_DMA_MsgBroker::transmit(const std::string& _str, const bool& _bloc
 	uint32_t pos = 0;
 	uint8_t retries = 0;
 	bool success = false;
+	std::cout << _str; //TODO: del on STM32
 	std::cout << "while(bytes_to_send > 0 if (HAL_UART_Transmit_DMA(UART_Handle, txBuffer, MINIMUM(bytes_to_send, BUFFER_SIZE)) == HAL_OK)" << std::endl; //TODO: change on STM32
-	success = true; 		//TODO: change on STM32
+	success = true; 		//TODO: change to false on STM32
 	/*while(bytes_to_send > 0){
 		std::memset(txBuffer, '\0', BUFFER_SIZE);
 		_str.copy((char*)txBuffer, MINIMUM(bytes_to_send, BUFFER_SIZE), pos);

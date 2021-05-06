@@ -9,9 +9,9 @@ struct Data;
 struct DataItem;
 struct Header;
 
-struct Visitor
+struct Encoder
 {
-	virtual ~Visitor() = default;
+	virtual ~Encoder() = default;
 
 	virtual void visit(const Header& p) = 0;
 	virtual void visit(const DataItem& p) = 0;
@@ -24,39 +24,39 @@ struct Visitor
 struct Element
 {
 	virtual ~Element() = default;
-	virtual void accept(Visitor& v) const = 0;
+	virtual void accept(Encoder& v) const = 0;
 };
 
 struct TextMessage : Element
 {
-	std::string text1;
-	std::string text2;
+	std::string part1;
+	std::string part2;
 
-	explicit TextMessage(std::string&& text1, std::string&& text2)
-		: text1(std::move(text1)), text2(std::move(text2))
+	explicit TextMessage(std::string&& _part1, std::string&& _part2)
+		: part1(std::move(_part1)), part2(std::move(_part2))
 	{
 	}
 
-	explicit TextMessage(const std::string& text1, const std::string& text2)
-		: text1(text1), text2(text2)
+	explicit TextMessage(const std::string& _part1, const std::string& _part2)
+		: part1(_part1), part2(_part2)
 	{
 	}
 };
 
 struct Header : TextMessage
 {
-	explicit Header(std::string&& text1, std::string&& text2)
-		: TextMessage(std::move(text1), std::move(text2))
+	explicit Header(std::string&& _part1, std::string&& _part2)
+		: TextMessage(std::move(_part1), std::move(_part2))
 	{
 	}
 
-	explicit Header(const std::string& text1, const std::string& text2)
-		: TextMessage(text1, text2)
+	explicit Header(const std::string& _part1, const std::string& _part2)
+		: TextMessage(_part1, _part2)
 	{
 	}
 
 
-	void accept(Visitor& v) const override
+	void accept(Encoder& v) const override
 	{
 		v.visit(*this);
 	}
@@ -64,19 +64,19 @@ struct Header : TextMessage
 
 struct DataItem : TextMessage
 {
-	explicit DataItem(std::string&& text1, std::string&& text2)
-		: TextMessage(std::move(text1), std::move(text2))
+	explicit DataItem(std::string&& _part1, std::string&& _part2)
+		: TextMessage(std::move(_part1), std::move(_part2))
 	{
 	}
 
-	explicit DataItem(const std::string& text1, const std::string& text2)
-		: TextMessage(text1, text2)
+	explicit DataItem(const std::string& _part1, const std::string& _part2)
+		: TextMessage(_part1, _part2)
 	{
 	}
 	
 
 
-	void accept(Visitor& v) const override
+	void accept(Encoder& v) const override
 	{
 		v.visit(*this);
 	}
@@ -84,17 +84,17 @@ struct DataItem : TextMessage
 
 struct Footer : TextMessage
 {
-	explicit Footer(std::string&& text1, std::string&& text2)
-		: TextMessage(std::move(text1), std::move(text2))
+	explicit Footer(std::string&& _part1, std::string&& _part2)
+		: TextMessage(std::move(_part1), std::move(_part2))
 	{
 	}
 
-	explicit Footer(const std::string& text1, const std::string& text2)
-		: TextMessage(text1, text2)
+	explicit Footer(const std::string& _part1, const std::string& _part2)
+		: TextMessage(_part1, _part2)
 	{
 	}
 
-	void accept(Visitor& v) const override
+	void accept(Encoder& v) const override
 	{
 		v.visit(*this);
 	}
@@ -102,12 +102,12 @@ struct Footer : TextMessage
 
 struct Data : std::vector<DataItem>, Element
 {
-	Data(const std::initializer_list<value_type>& _ilist)
-		: std::vector<DataItem>(_ilist)
+	Data(const std::initializer_list<value_type>& _init_list)
+		: std::vector<DataItem>(_init_list)
 	{
 	}
 
-	void accept(Visitor& v) const override
+	void accept(Encoder& v) const override
 	{
 		v.visit(*this);
 	}

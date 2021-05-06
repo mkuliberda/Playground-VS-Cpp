@@ -25,7 +25,7 @@ void WirelessTask()
 	MsgBrokerPtr p_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
 
 	{
-		p_broker->requestData({ ExternalObject_t::ntp_server, 999 }, "CurrentTime", true);
+		//p_broker->requestData({ ExternalObject_t::ntp_server, 999 }, "CurrentTime", true);
 		//Message msg = p_broker->readData(EXT_TIME_STR_LEN);
 		//msg.apply();
 	}
@@ -35,11 +35,11 @@ void WirelessTask()
 	while (true)
 	{
 		if (query == 1 /*some task requested sth */) {
-			p_broker->requestData({ExternalObject_t::raspberry_pi, 999}, "sth", true);
+			//p_broker->requestData({ExternalObject_t::raspberry_pi, 999}, "sth", true);
 			p_broker->readData(255);
 		}
 		else if (query == 2 /*another task requested sth */) {
-			p_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, "sth else", true);
+			//p_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, "sth else", true);
 			p_broker->readData(128);
 		}
 		//...
@@ -59,18 +59,18 @@ void GsmTask()
 	
 }
 
-struct JsonSerializer :Visitor {
+struct JsonPublisher :Encoder {
 
 	void visit(const Header& p) override {
-		oss << "{\"" << p.text1 <<">"<< p.text2 << "\":";
+		oss << "$PUB{\"" << p.part1 <<">"<< p.part2 << "\":";
 	}
 
 	void visit(const DataItem& li) override {
-		oss << "{\"" << li.text1 << "\":\"" << li.text2 << "\"},";
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
 	}
 
 	void visit(const Footer& li) override {
-		oss << "}\n" << li.text1 << li.text2;
+		oss << li.part1 << "}\n"  << li.part2;
 	}
 
 	void visit(const Data& l) override {
@@ -88,18 +88,47 @@ private:
 	std::ostringstream oss;
 };
 
-struct SmsSerializer :Visitor {
+struct JsonRequester :Encoder {
 
 	void visit(const Header& p) override {
-		oss << "[" << p.text1 <<" "<< p.text2 << ": ";
+		oss << "$GET{\"" << p.part1 << ">" << p.part2 << "\":";
 	}
 
 	void visit(const DataItem& li) override {
-		oss << li.text1 << "-" << li.text2 << ", ";
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
 	}
 
 	void visit(const Footer& li) override {
-		oss << "]\n";
+		oss << li.part1 << "}\n"  << li.part2;
+	}
+
+	void visit(const Data& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss.seekp(-1, std::ios_base::end);
+	}
+
+	std::string str() const override {
+		return oss.str();
+	}
+
+private:
+	std::ostringstream oss;
+};
+
+struct SmsSerializer :Encoder {
+
+	void visit(const Header& p) override {
+		oss << "[" << p.part1 <<" "<< p.part2 << ": ";
+	}
+
+	void visit(const DataItem& li) override {
+		oss << li.part1 << "-" << li.part2 << ", ";
+	}
+
+	void visit(const Footer& li) override {
+		oss << li.part1 << "]\n" << li.part2;
 	}
 
 	void visit(const Data& l) override {
@@ -129,13 +158,13 @@ int main()
 		Data list{ l1, l2 };
 		list.push_back(l1);
 		std::vector<Element*> document{ &p, &list, &end };
-		JsonSerializer jsonizer;
+		JsonPublisher json_pub_serializer;
 
 		for (auto item : document)
 		{
-			item->accept(jsonizer);
+			item->accept(json_pub_serializer);
 		}
-		std::cout << jsonizer.str();
+		std::cout << json_pub_serializer.str();
 	}
 
 	{
@@ -156,12 +185,14 @@ int main()
 	}
 
 	MsgBrokerPtr json_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
-	JsonSerializer jsonizer;
-	json_msg_broker->setEncoder(&jsonizer);
+	JsonPublisher json_pub_serializer;
+	JsonRequester json_get_serializer;
+	json_msg_broker->setEncoder(&json_pub_serializer);
 	json_msg_broker->setInternalAddresses(&internal_entities);
 	json_msg_broker->setExternalAddresses(&esp01s_external_addresses);
+	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 },  { {"Soil moisture", 18}, {"Type", 2} }, false);
 
-	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 },  { {"Soil moisture", 18}, {"Type", 2} });
+	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_get_serializer);
 
 
 	getchar();
