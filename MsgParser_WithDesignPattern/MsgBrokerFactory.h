@@ -12,7 +12,7 @@ enum class MsgBrokerType {
 class MsgBrokerFactory
 {
 public:
-	static MsgBrokerPtr create(const MsgBrokerType& _type, DevHandle *_dev_handle=nullptr);
+	static MsgBrokerPtr create(const MsgBrokerType& _type, void *_dev_handle=nullptr);
 };
 
 #endif

@@ -16,16 +16,16 @@ class HAL_UART_DMA_MsgBroker :
 public:
 
 	HAL_UART_DMA_MsgBroker() =default;
-    HAL_UART_DMA_MsgBroker(DevHandle* _dev_handle){
+    HAL_UART_DMA_MsgBroker(void* _dev_handle){
        if (_dev_handle != nullptr){
-		   UART_Handle = (DevHandle*)_dev_handle;
-		   devValid = true;
+		   uart_handle = static_cast<UART_HandleTypeDef*>(_dev_handle);
+		   dev_valid = true;
 	   } 
     }
-	bool assignDevice(DevHandle* _dev_handle) override;
-	bool sendMsg(const ExternalObject& _recipient, const std::string& _msg, Encoder *_encoder = nullptr, const bool& _wait_until_cplt = false) override;
+	bool assignDevice(void* _dev_handle) override;
+	bool sendMsg(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _msg, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
 	bool publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
-	bool requestData(const ExternalObject& _recipient, const std::string& _data_key, Encoder *_encoder = nullptr, const bool& _wait_until_cplt = false) override;
+	bool requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
 	//bool setParser(MsgParser *_parser) override;
 	bool setEncoder(Encoder *_encoder) override;
 	void setExternalAddresses(std::unordered_map<ExternalObject_t, std::string> *_addresses) override;
@@ -38,18 +38,17 @@ public:
 
 
 private:
-    bool transmit(const std::string& _str, const bool& _blocking_mode); 
-	const char *pub_hdr = "$PUB\\";
+	bool transmit(const std::string& _str, const bool& _blocking_mode); 
 	const char *get_hdr = "$GET\\";
 	const char *msg_ending = "\n";
-	UART_HandleTypeDef *UART_Handle{};
-	uint8_t txBuffer[BUFFER_SIZE]{};
-	uint8_t rxBuffer[BUFFER_SIZE]{};
+	UART_HandleTypeDef *uart_handle{};
+	uint8_t tx_buffer[BUFFER_SIZE]{};
+	uint8_t rx_buffer[BUFFER_SIZE]{};
 	std::unordered_map<ExternalObject_t, std::string> *ext_address_map{};
 	std::unordered_map<InternalObject_t, std::string> *int_address_map{};
 	//MsgParser *parserInstance{};
 	Encoder *encoder{};
-	bool devValid{false};
+	bool dev_valid{false};
 };
 
 #endif

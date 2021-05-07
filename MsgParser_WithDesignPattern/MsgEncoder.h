@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
 #include "Messages.h"
 
 struct Footer;
@@ -18,7 +19,7 @@ struct Encoder
 	virtual void visit(const Data& p) = 0;
 	virtual void visit(const Footer& p) = 0;
 
-	virtual std::string str() const = 0;
+	virtual std::string str() = 0;
 };
 
 struct Element
@@ -111,5 +112,131 @@ struct Data : std::vector<DataItem>, Element
 	{
 		v.visit(*this);
 	}
+};
+
+struct JsonPublisher :Encoder {
+
+	void visit(const Header& p) override {
+		oss << "$PUB{\"" << p.part1 << ">" << p.part2 << "\":";
+	}
+
+	void visit(const DataItem& li) override {
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
+	}
+
+	void visit(const Footer& li) override {
+		oss << li.part1 << "}\n" << li.part2;
+	}
+
+	void visit(const Data& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss.seekp(-1, std::ios_base::end);
+	}
+
+	std::string str() override {
+		std::string str_{ oss.str() };
+		oss.str(""); oss.clear();
+		return str_;
+	}
+
+private:
+	std::ostringstream oss;
+};
+
+struct JsonMessenger :Encoder {
+
+	void visit(const Header& p) override {
+		oss << "$MSG{\"" << p.part1 << ">" << p.part2 << "\":";
+	}
+
+	void visit(const DataItem& li) override {
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"}";
+	}
+
+	void visit(const Footer& li) override {
+		oss << li.part1 << "}\n" << li.part2;
+	}
+
+	void visit(const Data& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+			//oss << ",";
+		}
+		oss.seekp(-1, std::ios_base::end);
+	}
+
+	std::string str() override {
+		std::string str_{ oss.str() };
+		oss.str(""); oss.clear();
+		return str_;
+	}
+
+private:
+	std::ostringstream oss;
+};
+
+
+struct JsonRequester :Encoder {
+
+	void visit(const Header& p) override {
+		oss << "$GET{\"" << p.part1 << ">" << p.part2 << "\":";
+	}
+
+	void visit(const DataItem& li) override {
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
+	}
+
+	void visit(const Footer& li) override {
+		oss << li.part1 << "}\n" << li.part2;
+	}
+
+	void visit(const Data& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss.seekp(-1, std::ios_base::end);
+	}
+
+	std::string str() override {
+		std::string str_{ oss.str() };
+		oss.str(""); oss.clear();
+		return str_;
+	}
+
+private:
+	std::ostringstream oss;
+};
+
+struct SmsSerializer :Encoder {
+
+	void visit(const Header& p) override {
+		oss << "[" << p.part1 << " " << p.part2 << ": ";
+	}
+
+	void visit(const DataItem& li) override {
+		oss << li.part1 << "-" << li.part2 << ", ";
+	}
+
+	void visit(const Footer& li) override {
+		oss << li.part1 << "]\n" << li.part2;
+	}
+
+	void visit(const Data& l) override {
+		for (const auto& item : l) {
+			item.accept(*this);
+		}
+		oss.seekp(-2, std::ios_base::end);
+	}
+
+	std::string str() override {
+		std::string str_{ oss.str() };
+		oss.str(""); oss.clear();
+		return str_;
+	}
+
+private:
+	std::ostringstream oss;
 };
 

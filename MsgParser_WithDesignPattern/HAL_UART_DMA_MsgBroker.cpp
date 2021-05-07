@@ -8,42 +8,41 @@
 
 //extern const UBaseType_t xArrayIndex; //TODO: uncomment on STM32
 
-bool HAL_UART_DMA_MsgBroker::assignDevice(DevHandle *_dev_handle)
+bool HAL_UART_DMA_MsgBroker::assignDevice(void *_dev_handle)
 {
 	if (_dev_handle == nullptr) return false;
-	UART_Handle = _dev_handle;
-	return devValid = true;
+	uart_handle = static_cast<UART_HandleTypeDef*>(_dev_handle);
+	return dev_valid = true;
 }
 
-bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const std::string& _msg, Encoder *_encoder, const bool& _wait_until_cplt)
-{	
-	
-	std::string str_msg{pub_hdr};
-	const std::string msg_start{R"({"Msg":")"};
-	const std::string msg_end{"\"}"};
-	bool result = false;
+bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _msg, const bool& _wait_until_cplt, Encoder *_encoder)
+{
+	_ASSERT(_publisher.id > 999 || _recipient.id > 999);
 
-	switch (_recipient.object) {
-	case ExternalObject_t::raspberry_pi:
-		str_msg += ext_address_map->at(ExternalObject_t::raspberry_pi) + msg_start + _msg + msg_end + msg_ending;
-        result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::google_home:
-		str_msg +=  ext_address_map->at(ExternalObject_t::google_home) + msg_start + _msg + msg_end + msg_ending;
-        result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::broadcast:
-		str_msg +=  ext_address_map->at(ExternalObject_t::broadcast) + msg_start + _msg + msg_end + msg_ending;
-        result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::ntp_server:
-		break;
-	case ExternalObject_t::my_phone:
-		break;
-	default:
-		break;
+	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
+	const std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
+	id_str = std::to_string(_recipient.id); //TODO: patch::to_string
+	const std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
+
+	const Header hdr{ int_address_map->at(_publisher.object) + pub_id,  ext_address_map->at(_recipient.object) + rcv_id };
+	const DataItem msg{ "Info", _msg };
+	const Footer end{ "", "" };
+
+	if (_encoder != nullptr) {
+		hdr.accept(*_encoder);
+		msg.accept(*_encoder);
+		end.accept(*_encoder);
+		return transmit(_encoder->str(), _wait_until_cplt);
 	}
-	return result;
+	if (encoder != nullptr)
+	{
+		hdr.accept(*encoder);
+		msg.accept(*encoder);
+		end.accept(*encoder);
+		return transmit(encoder->str(), _wait_until_cplt);
+	}
+
+	return false;
 }
 
 bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt, Encoder *_encoder)
@@ -51,9 +50,9 @@ bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const
 	_ASSERT(_publisher.id > 999 || _recipient.id > 999);
 
 	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
-	std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
+	const std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
 	id_str = std::to_string(_recipient.id); //TODO: patch::to_string
-	std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
+	const std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
 	
 	Header hdr{ int_address_map->at(_publisher.object) + pub_id,  ext_address_map->at(_recipient.object) + rcv_id};
 	Data data_list{};
@@ -76,48 +75,9 @@ bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const
 	}
 
 	return false;
-	
-	/*std::string str_msg{ "{\"" };
-	str_msg += int_address_map->at(_publisher.object);
-	str_msg += "\":[";
-
-
-	for (const auto& kv : _values) {
-		str_msg += '\"';
-		str_msg += kv.first;
-		str_msg += '\"';
-		str_msg += ':';
-		str_msg += patch::to_string(kv.second);
-		str_msg += ",";
-	}
-	str_msg.pop_back(); //remove last comma 
-	str_msg += "]}";
-	str_msg += msg_ending;
-
-	switch (_recipient.object) {
-	case ExternalObject_t::raspberry_pi:
-		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::raspberry_pi) + str_msg);
-        result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::google_home:
-		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::google_home) + str_msg);
-		result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::broadcast:
-		str_msg = (static_cast<std::string>(pub_hdr) +  ext_address_map->at(ExternalObject_t::broadcast) + str_msg);
-		result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::ntp_server:
-		break;
-	case ExternalObject_t::my_phone:
-		break;
-	default:
-		break;
-	}
-	return result;*/
 }
 
-bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const std::string& _data_key, Encoder *_encoder, const bool& _wait_until_cplt)
+bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt, Encoder *_encoder)
 {
 	std::string str_msg{ get_hdr };
 	bool result = false;
@@ -168,26 +128,26 @@ void HAL_UART_DMA_MsgBroker::setInternalAddresses(std::unordered_map<InternalObj
 }
 
 bool HAL_UART_DMA_MsgBroker::readData(const size_t& _size, void(*action)(const std::string&)){
-	memset(rxBuffer, '\0', BUFFER_SIZE);
-	if (devValid){
+	memset(rx_buffer, '\0', BUFFER_SIZE);
+	if (dev_valid){
 		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rxBuffer, _size);" << std::endl; //TODO: change on STM32
 	}
 	std::cout << "ulTaskNotifyTake( xArrayIndex, osWaitForever);" << std::endl; //TODO: change on STM32
-	if(rxBuffer[0] == '{' && rxBuffer[_size-1] == '}'){
-		const std::string time_str{reinterpret_cast<char*>(rxBuffer)};
+	if(rx_buffer[0] == '{' && rx_buffer[_size-1] == '}'){
+		const std::string time_str{reinterpret_cast<char*>(rx_buffer)};
 		return true;// (parserInstance != nullptr) ? parserInstance->parseString(time_str, action) : false;
 	}
 	return false;
 }
 
 bool HAL_UART_DMA_MsgBroker::readData(const size_t& _size){
-	memset(rxBuffer, '\0', BUFFER_SIZE);
-	if (devValid){
+	memset(rx_buffer, '\0', BUFFER_SIZE);
+	if (dev_valid){
 		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rxBuffer, _size);" << std::endl; //TODO: change on STM32
 	}
 	std::cout << "ulTaskNotifyTake( xArrayIndex, osWaitForever);" << std::endl; //TODO: change on STM32
-	if(rxBuffer[0] == '{' && rxBuffer[_size-1] == '}'){
-		const std::string time_str{reinterpret_cast<char*>(rxBuffer)};
+	if(rx_buffer[0] == '{' && rx_buffer[_size-1] == '}'){
+		const std::string time_str{reinterpret_cast<char*>(rx_buffer)};
 		return true; // (parserInstance != nullptr) ? parserInstance->parseString(time_str) : false;
 	}
 	return false;

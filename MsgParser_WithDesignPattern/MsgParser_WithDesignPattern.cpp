@@ -59,93 +59,6 @@ void GsmTask()
 	
 }
 
-struct JsonPublisher :Encoder {
-
-	void visit(const Header& p) override {
-		oss << "$PUB{\"" << p.part1 <<">"<< p.part2 << "\":";
-	}
-
-	void visit(const DataItem& li) override {
-		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
-	}
-
-	void visit(const Footer& li) override {
-		oss << li.part1 << "}\n"  << li.part2;
-	}
-
-	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-		}
-		oss.seekp(-1, std::ios_base::end);		
-	}
-
-	std::string str() const override {
-		return oss.str();
-	}
-
-private:
-	std::ostringstream oss;
-};
-
-struct JsonRequester :Encoder {
-
-	void visit(const Header& p) override {
-		oss << "$GET{\"" << p.part1 << ">" << p.part2 << "\":";
-	}
-
-	void visit(const DataItem& li) override {
-		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
-	}
-
-	void visit(const Footer& li) override {
-		oss << li.part1 << "}\n"  << li.part2;
-	}
-
-	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-		}
-		oss.seekp(-1, std::ios_base::end);
-	}
-
-	std::string str() const override {
-		return oss.str();
-	}
-
-private:
-	std::ostringstream oss;
-};
-
-struct SmsSerializer :Encoder {
-
-	void visit(const Header& p) override {
-		oss << "[" << p.part1 <<" "<< p.part2 << ": ";
-	}
-
-	void visit(const DataItem& li) override {
-		oss << li.part1 << "-" << li.part2 << ", ";
-	}
-
-	void visit(const Footer& li) override {
-		oss << li.part1 << "]\n" << li.part2;
-	}
-
-	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-		}
-		oss.seekp(-2, std::ios_base::end);
-	}
-
-	std::string str() const override {
-		return oss.str();
-	}
-
-private:
-	std::ostringstream oss;
-};
-
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -187,13 +100,16 @@ int main()
 	MsgBrokerPtr json_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
 	JsonPublisher json_pub_serializer;
 	JsonRequester json_get_serializer;
+	JsonMessenger json_msg_serializer;
 	json_msg_broker->setEncoder(&json_pub_serializer);
 	json_msg_broker->setInternalAddresses(&internal_entities);
 	json_msg_broker->setExternalAddresses(&esp01s_external_addresses);
 	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 },  { {"Soil moisture", 18}, {"Type", 2} }, false);
-
 	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_get_serializer);
-
+	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_get_serializer);
+	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
 
 	getchar();
 	return 0;
