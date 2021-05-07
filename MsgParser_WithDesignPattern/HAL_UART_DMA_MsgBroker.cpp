@@ -17,7 +17,7 @@ bool HAL_UART_DMA_MsgBroker::assignDevice(void *_dev_handle)
 
 bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _msg, const bool& _wait_until_cplt, Encoder *_encoder)
 {
-	_ASSERT(_publisher.id > 999 || _recipient.id > 999);
+	_ASSERT(_publisher.id > 999 || _recipient.id > 999); //TODO: change this on STM32
 
 	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
 	const std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
@@ -47,7 +47,7 @@ bool HAL_UART_DMA_MsgBroker::sendMsg(const ExternalObject& _recipient, const Int
 
 bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt, Encoder *_encoder)
 {
-	_ASSERT(_publisher.id > 999 || _recipient.id > 999);
+	_ASSERT(_publisher.id > 999 || _recipient.id > 999); //TODO: change this on STM32
 
 	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
 	const std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
@@ -77,32 +77,34 @@ bool HAL_UART_DMA_MsgBroker::publishData(const ExternalObject& _recipient, const
 	return false;
 }
 
-bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt, Encoder *_encoder)
+bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _data_key, const std::string& _data_type, const bool& _wait_until_cplt, Encoder *_encoder)
 {
-	std::string str_msg{ get_hdr };
-	bool result = false;
+	_ASSERT(_publisher.id > 999 || _recipient.id > 999); //TODO: change this on STM32
 
-	switch (_recipient.object) {
-	case ExternalObject_t::raspberry_pi:
-		str_msg +=  ext_address_map->at(ExternalObject_t::raspberry_pi) + _data_key + msg_ending;
-		result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::google_home:
-		str_msg +=  ext_address_map->at(ExternalObject_t::google_home) + _data_key + msg_ending;
-		result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::ntp_server:
-		str_msg +=  ext_address_map->at(ExternalObject_t::ntp_server) + _data_key + msg_ending;
-        result = transmit(str_msg, _wait_until_cplt);
-		break;
-	case ExternalObject_t::my_phone:
-		break;
-	case ExternalObject_t::broadcast:
-		break;
-	default:
-		break;
+	std::string id_str = std::to_string(_publisher.id); //TODO: patch::to_string
+	const std::string pub_id = std::string(3 - id_str.length(), '0') + id_str;
+	id_str = std::to_string(_recipient.id); //TODO: patch::to_string
+	const std::string rcv_id = std::string(3 - id_str.length(), '0') + id_str;
+
+	const Header hdr{ int_address_map->at(_publisher.object) + pub_id,  ext_address_map->at(_recipient.object) + rcv_id };
+	const DataItem msg{ _data_key, _data_type };
+	const Footer end{ "", "" };
+
+	if (_encoder != nullptr) {
+		hdr.accept(*_encoder);
+		msg.accept(*_encoder);
+		end.accept(*_encoder);
+		return transmit(_encoder->str(), _wait_until_cplt);
 	}
-	return result;
+	if (encoder != nullptr)
+	{
+		hdr.accept(*encoder);
+		msg.accept(*encoder);
+		end.accept(*encoder);
+		return transmit(encoder->str(), _wait_until_cplt);
+	}
+
+	return false;
 }
 
 // bool HAL_UART_DMA_MsgBroker::setParser(MsgParser *_parser){
@@ -112,7 +114,7 @@ bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const
 // 	}
 // 	return false;
 // }
- bool HAL_UART_DMA_MsgBroker::setEncoder(Encoder*_encoder){
+ bool HAL_UART_DMA_MsgBroker::setDefaultEncoder(Encoder*_encoder){
 	 if (_encoder == nullptr) return false;
 	 encoder = _encoder;
 	 return true;

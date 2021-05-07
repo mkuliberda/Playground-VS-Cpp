@@ -4,6 +4,8 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <windows.h>
+
 #include "Messages.h"
 #include "MsgBroker.h"
 #include "MsgBrokerFactory.h"
@@ -22,39 +24,54 @@ UART_HandleTypeDef huart3;
 
 void WirelessTask()
 {
-	MsgBrokerPtr p_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
-
-	{
-		//p_broker->requestData({ ExternalObject_t::ntp_server, 999 }, "CurrentTime", true);
-		//Message msg = p_broker->readData(EXT_TIME_STR_LEN);
-		//msg.apply();
-	}
+	MsgBrokerPtr json_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
+	JsonPubEncoder json_pub_serializer{};
+	JsonReqEncoder json_get_serializer{};
+	JsonMsgEncoder json_msg_serializer{};
 
 	int query = 3;
 
 	while (true)
 	{
+		json_msg_broker->setDefaultEncoder(&json_pub_serializer);
+		json_msg_broker->setInternalAddresses(&internal_entities);
+		json_msg_broker->setExternalAddresses(&esp01s_external_addresses);
+		json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false);
+		json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_pub_serializer);
+		json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_pub_serializer);
+		json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+		json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+		json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+		json_msg_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 17 }, "Time", "Local", false, &json_get_serializer);
+		json_msg_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 17 }, "Time", "UTC", false, &json_get_serializer);
+
 		if (query == 1 /*some task requested sth */) {
 			//p_broker->requestData({ExternalObject_t::raspberry_pi, 999}, "sth", true);
-			p_broker->readData(255);
+			json_msg_broker->readData(255);
 		}
 		else if (query == 2 /*another task requested sth */) {
 			//p_broker->requestData({ ExternalObject_t::raspberry_pi, 999 }, "sth else", true);
-			p_broker->readData(128);
+			json_msg_broker->readData(128);
 		}
+		Sleep(1000);
 		//...
 	}
 }
 
 void GsmTask()
 {
-	MsgBrokerPtr p_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart3);
+	MsgBrokerPtr sms_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart3);
+	SmsMsgEncoder sms_encoder{};
+	sms_msg_broker->setDefaultEncoder(&sms_encoder);
+	sms_msg_broker->setInternalAddresses(&internal_entities);
+	sms_msg_broker->setExternalAddresses(&mobile_numbers);
+
 
 	while (true)
 	{
-		p_broker->readData(255);
-		
-		
+		sms_msg_broker->sendMsg({ ExternalObject_t::my_phone, 0 }, { InternalObject_t::sector, 4 }, "is ok", false);
+		sms_msg_broker->readData(255);
+		Sleep(1000);
 	}
 	
 }
@@ -71,7 +88,7 @@ int main()
 		Data list{ l1, l2 };
 		list.push_back(l1);
 		std::vector<Element*> document{ &p, &list, &end };
-		JsonPublisher json_pub_serializer;
+		JsonPubEncoder json_pub_serializer;
 
 		for (auto item : document)
 		{
@@ -88,7 +105,7 @@ int main()
 
 		Data list{ l3, l4 };
 		std::vector<Element*> document{ &p, &list, &end };
-		SmsSerializer smsizer;
+		SmsMsgEncoder smsizer;
 
 		for (auto item : document)
 		{
@@ -97,19 +114,8 @@ int main()
 		std::cout << smsizer.str();
 	}
 
-	MsgBrokerPtr json_msg_broker = MsgBrokerFactory::create(MsgBrokerType::hal_uart_dma, &huart2);
-	JsonPublisher json_pub_serializer;
-	JsonRequester json_get_serializer;
-	JsonMessenger json_msg_serializer;
-	json_msg_broker->setEncoder(&json_pub_serializer);
-	json_msg_broker->setInternalAddresses(&internal_entities);
-	json_msg_broker->setExternalAddresses(&esp01s_external_addresses);
-	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 899 }, { InternalObject_t::plant, 16 },  { {"Soil moisture", 18}, {"Type", 2} }, false);
-	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_get_serializer);
-	json_msg_broker->publishData({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, { {"Soil moisture", 18}, {"Type", 2} }, false, &json_get_serializer);
-	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
-	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
-	json_msg_broker->sendMsg({ ExternalObject_t::raspberry_pi, 999 }, { InternalObject_t::sector, 16 }, "This is first message", false, &json_msg_serializer);
+	//WirelessTask();
+	GsmTask();
 
 	getchar();
 	return 0;

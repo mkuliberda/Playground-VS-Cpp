@@ -114,7 +114,7 @@ struct Data : std::vector<DataItem>, Element
 	}
 };
 
-struct JsonPublisher :Encoder {
+struct JsonPubEncoder :Encoder {
 
 	void visit(const Header& p) override {
 		oss << "$PUB{\"" << p.part1 << ">" << p.part2 << "\":";
@@ -145,7 +145,7 @@ private:
 	std::ostringstream oss;
 };
 
-struct JsonMessenger :Encoder {
+struct JsonMsgEncoder :Encoder {
 
 	void visit(const Header& p) override {
 		oss << "$MSG{\"" << p.part1 << ">" << p.part2 << "\":";
@@ -160,11 +160,6 @@ struct JsonMessenger :Encoder {
 	}
 
 	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-			//oss << ",";
-		}
-		oss.seekp(-1, std::ios_base::end);
 	}
 
 	std::string str() override {
@@ -178,14 +173,14 @@ private:
 };
 
 
-struct JsonRequester :Encoder {
+struct JsonReqEncoder :Encoder {
 
 	void visit(const Header& p) override {
 		oss << "$GET{\"" << p.part1 << ">" << p.part2 << "\":";
 	}
 
 	void visit(const DataItem& li) override {
-		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"},";
+		oss << "{\"" << li.part1 << "\":\"" << li.part2 << "\"}";
 	}
 
 	void visit(const Footer& li) override {
@@ -193,10 +188,6 @@ struct JsonRequester :Encoder {
 	}
 
 	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-		}
-		oss.seekp(-1, std::ios_base::end);
 	}
 
 	std::string str() override {
@@ -209,14 +200,14 @@ private:
 	std::ostringstream oss;
 };
 
-struct SmsSerializer :Encoder {
+struct SmsMsgEncoder :Encoder {
 
 	void visit(const Header& p) override {
-		oss << "[" << p.part1 << " " << p.part2 << ": ";
+		oss << "[" << p.part1 << " ";
 	}
 
 	void visit(const DataItem& li) override {
-		oss << li.part1 << "-" << li.part2 << ", ";
+		oss << li.part1 << ": " << li.part2;
 	}
 
 	void visit(const Footer& li) override {
@@ -224,10 +215,6 @@ struct SmsSerializer :Encoder {
 	}
 
 	void visit(const Data& l) override {
-		for (const auto& item : l) {
-			item.accept(*this);
-		}
-		oss.seekp(-2, std::ios_base::end);
 	}
 
 	std::string str() override {

@@ -25,9 +25,9 @@ public:
 	bool assignDevice(void* _dev_handle) override;
 	bool sendMsg(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _msg, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
 	bool publishData(const ExternalObject& _recipient, const InternalObject& _publisher, std::unordered_map<std::string, int32_t> _values, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
-	bool requestData(const ExternalObject& _recipient, const std::string& _data_key, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
+	bool requestData(const ExternalObject& _recipient, const InternalObject& _publisher, const std::string& _data_key, const std::string& _data_type, const bool& _wait_until_cplt, Encoder *_encoder = nullptr) override;
 	//bool setParser(MsgParser *_parser) override;
-	bool setEncoder(Encoder *_encoder) override;
+	bool setDefaultEncoder(Encoder *_encoder) override;
 	void setExternalAddresses(std::unordered_map<ExternalObject_t, std::string> *_addresses) override;
 	void setInternalAddresses(std::unordered_map<InternalObject_t, std::string> *_addresses) override;
 	bool readData(const size_t& _size, void(*action)(const std::string&)) override;
