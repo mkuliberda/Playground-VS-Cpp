@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <array>
 
 
 enum class ExternalObject_t {
@@ -24,19 +25,17 @@ enum class MsgType {
 	unknown,
 	command,
 	query,
-	info
+	info,
+	max = 1023
 };
 
-enum class CommandType {
+enum class MsgValueType {
 	none,
 	irrigation_start,
-	irrigation_stop
-};
-
-enum class QueryType {
-	none,
+	irrigation_stop,
 	get_status,
-	get_time_and_date
+	get_time_and_date,
+	max = 1023
 };
 
 inline std::unordered_map<InternalObject_t, std::string> internal_entities{  // NOLINT(clang-diagnostic-exit-time-destructors)
@@ -70,24 +69,39 @@ struct InternalObject {
 	uint16_t id;
 };
 
+struct MessagePayload
+{
+	MsgType msg_type;
+	MsgValueType msg_value;
+};
+
 struct InternalMessage
 {
 	InternalObject recipient;
 	InternalObject sender;
 	MsgType msg_type;
+	MsgValueType msg_val;
 };
 
 struct IncomingMessage
 {
 	ExternalObject sender;
 	InternalObject recipient;
-	MsgType msg_type;
-
+	MsgValueType type;
+	uint16_t msg_value1;
+	uint16_t msg_value2;
+	uint16_t msg_value3;
+	uint16_t msg_value4;
+	uint16_t msg_value5;
+	uint16_t msg_value6;
+	uint16_t msg_value7;
+	uint16_t msg_value8;
+	uint8_t end;
 };
 
 struct OutgoingMessage
 {
 	ExternalObject recipient;
 	InternalObject sender;
-	MsgType msg_type;
+	std::array<MessagePayload, 8> payload;
 };

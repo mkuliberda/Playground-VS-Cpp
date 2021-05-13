@@ -24,6 +24,12 @@
     <ClCompile Include="HAL_UART_DMA_MsgBroker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Esp01s_MsgParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SMS_MsgParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MsgBrokerFactory.h">
@@ -51,6 +57,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MsgEncoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Esp01s_MsgParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMS_MsgParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

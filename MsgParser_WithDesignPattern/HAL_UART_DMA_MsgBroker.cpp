@@ -4,8 +4,6 @@
 #include <cstring>
 #include "cmsis_os.h"
 
-//TODO: check if MsgBrokers can be implemented with Strategy design pattern
-
 //extern const UBaseType_t xArrayIndex; //TODO: uncomment on STM32
 
 bool HAL_UART_DMA_MsgBroker::assignDevice(void *_dev_handle)
@@ -107,15 +105,16 @@ bool HAL_UART_DMA_MsgBroker::requestData(const ExternalObject& _recipient, const
 	return false;
 }
 
-// bool HAL_UART_DMA_MsgBroker::setParser(MsgParser *_parser){
-// 	if (_parser != nullptr){
-// 		parserInstance = _parser;
-// 		return true;
-// 	}
-// 	return false;
-// }
+ bool HAL_UART_DMA_MsgBroker::setDefaultParser(MsgParser *_parser){
+	if (_parser == nullptr) return false;
+	delete this->parser;
+ 	parser= _parser;
+ 	return true;
+ 	
+ }
  bool HAL_UART_DMA_MsgBroker::setDefaultEncoder(Encoder*_encoder){
 	 if (_encoder == nullptr) return false;
+	 delete this->encoder;
 	 encoder = _encoder;
 	 return true;
  }
@@ -129,30 +128,26 @@ void HAL_UART_DMA_MsgBroker::setInternalAddresses(std::unordered_map<InternalObj
 	int_address_map = _addresses;
 }
 
-bool HAL_UART_DMA_MsgBroker::readData(const size_t& _size, void(*action)(const std::string&)){
-	memset(rx_buffer, '\0', BUFFER_SIZE);
+bool HAL_UART_DMA_MsgBroker::readData(void(*action)(const std::string&)){
+	memset(rx_buffer, '\0', buffer_size);
 	if (dev_valid){
-		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rxBuffer, _size);" << std::endl; //TODO: change on STM32
+		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rxBuffer, msg_in_len);" << std::endl; //TODO: change on STM32
 	}
 	std::cout << "ulTaskNotifyTake( xArrayIndex, osWaitForever);" << std::endl; //TODO: change on STM32
-	if(rx_buffer[0] == '{' && rx_buffer[_size-1] == '}'){
+	if(rx_buffer[0] == '{' && rx_buffer[msg_in_len -1] == '}'){
 		const std::string time_str{reinterpret_cast<char*>(rx_buffer)};
 		return true;// (parserInstance != nullptr) ? parserInstance->parseString(time_str, action) : false;
 	}
 	return false;
 }
 
-bool HAL_UART_DMA_MsgBroker::readData(const size_t& _size){
-	memset(rx_buffer, '\0', BUFFER_SIZE);
+bool HAL_UART_DMA_MsgBroker::readData(){
+	memset(rx_buffer, '\0', buffer_size);
 	if (dev_valid){
-		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rxBuffer, _size);" << std::endl; //TODO: change on STM32
+		std::cout << "HAL_UART_Receive_DMA(UART_Handle, rx_buffer, msg_in_len);" << std::endl; //TODO: change on STM32
 	}
 	std::cout << "ulTaskNotifyTake( xArrayIndex, osWaitForever);" << std::endl; //TODO: change on STM32
-	if(rx_buffer[0] == '{' && rx_buffer[_size-1] == '}'){
-		const std::string time_str{reinterpret_cast<char*>(rx_buffer)};
-		return true; // (parserInstance != nullptr) ? parserInstance->parseString(time_str) : false;
-	}
-	return false;
+	return true;
 }
 
 bool HAL_UART_DMA_MsgBroker::transmit(const std::string& _str, const bool& _blocking_mode){
@@ -161,16 +156,16 @@ bool HAL_UART_DMA_MsgBroker::transmit(const std::string& _str, const bool& _bloc
 	uint8_t retries = 0;
 	bool success = false;
 	std::cout << _str; //TODO: del on STM32
-	std::cout << "while(bytes_to_send > 0 if (HAL_UART_Transmit_DMA(UART_Handle, txBuffer, MINIMUM(bytes_to_send, BUFFER_SIZE)) == HAL_OK)" << std::endl; //TODO: change on STM32
+	std::cout << "while(bytes_to_send > 0 if (HAL_UART_Transmit_DMA(UART_Handle, txBuffer, MINIMUM(bytes_to_send, buffer_size)) == HAL_OK)" << std::endl; //TODO: change on STM32
 	success = true; 		//TODO: change to false on STM32
 	/*while(bytes_to_send > 0){
-		std::memset(txBuffer, '\0', BUFFER_SIZE);
-		_str.copy((char*)txBuffer, MINIMUM(bytes_to_send, BUFFER_SIZE), pos);
+		std::memset(txBuffer, '\0', buffer_size);
+		_str.copy((char*)txBuffer, MINIMUM(bytes_to_send, buffer_size), pos);
 		if (devValid){
-			if (HAL_UART_Transmit_DMA(UART_Handle, txBuffer, MINIMUM(bytes_to_send, BUFFER_SIZE)) == HAL_OK){
+			if (HAL_UART_Transmit_DMA(UART_Handle, txBuffer, MINIMUM(bytes_to_send, buffer_size)) == HAL_OK){
 				if (_blocking_mode)	ulTaskNotifyTake( xArrayIndex, osWaitForever);
-				bytes_to_send -= BUFFER_SIZE;
-				pos += BUFFER_SIZE;
+				bytes_to_send -= buffer_size;
+				pos += buffer_size;
 				success = true;
 				retries = 0;
 			}
@@ -182,6 +177,13 @@ bool HAL_UART_DMA_MsgBroker::transmit(const std::string& _str, const bool& _bloc
 		}
 	}*/
 	return success;
-} 
+}
+
+IncomingMessage HAL_UART_DMA_MsgBroker::getIncoming(MsgParser *_parser)
+{
+	if (_parser != nullptr) return _parser->parseIncoming(rx_buffer, msg_in_len);
+	else if( parser != nullptr)	return parser->parseIncoming(rx_buffer, msg_in_len);
+	return {};
+}
 
 

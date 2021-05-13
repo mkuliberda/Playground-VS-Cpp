@@ -3,7 +3,6 @@
 #include <utility>
 #include <vector>
 #include <sstream>
-#include "Messages.h"
 
 struct Footer;
 struct Data;
